@@ -1,475 +1,178 @@
 <!DOCTYPE html>
 <html lang="am">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ከምባታ ዲጂታል መድረክ - Kembata Digital Platform</title>
-<style>
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-font-family: 'Segoe UI', Arial, sans-serif;
-}
-body {
-background-color: #f4f7f6;
-color: #333;
-line-height: 1.6;
-}
-header {
-background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://via.placeholder.com/1200x400') no-repeat center center/cover;
-color: white;
-text-align: center;
-padding: 80px 20px;
-}
-header h1 {
-font-size: 3rem;
-margin-bottom: 10px;
-color: #ffca28;
-}
-header p {
-font-size: 1.2rem;
-}
-nav {
-background-color: #1b5e20;
-position: sticky;
-top: 0;
-z-index: 1000;
-display: flex;
-justify-content: center;
-gap: 15px;
-padding: 15px;
-flex-wrap: wrap;
-}
-nav a {
-color: white;
-text-decoration: none;
-font-weight: bold;
-padding: 8px 16px;
-border-radius: 5px;
-transition: 0.3s;
-}
-nav a:hover {
-background-color: #2e7d32;
-}
-.container {
-max-width: 1100px;
-margin: 30px auto;
-padding: 0 20px;
-}
-.section-card {
-background: white;
-border-radius: 8px;
-padding: 25px;
-margin-bottom: 30px;
-box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-.section-title {
-color: #1b5e20;
-border-bottom: 3px solid #ffca28;
-padding-bottom: 8px;
-margin-bottom: 20px;
-}
-.btn {
-background-color: #1b5e20;
-color: white;
-border: none;
-padding: 10px 20px;
-border-radius: 5px;
-cursor: pointer;
-font-weight: bold;
-text-decoration: none;
-display: inline-block;
-margin-top: 10px;
-}
-.btn:hover {
-background-color: #2e7d32;
-}
-.city-grid, .agency-grid, .book-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-gap: 20px;
-margin-top: 15px;
-}
-.card {
-border: 1px solid #ddd;
-border-radius: 8px;
-padding: 15px;
-text-align: center;
-background: #fafafa;
-}
-.card img {
-width: 100%;
-height: 180px;
-object-fit: cover;
-border-radius: 5px;
-margin-bottom: 10px;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kilogram Web</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #0e1621;
+      --bg-sidebar: #17212b;
+      --bg-chat: #0e1621;
+      --primary: #2b5278;
+      --accent: #5288c1;
+      --text-main: #f5f5f5;
+      --text-muted: #7f91a4;
+      --msg-out: #2b5278;
+      --msg-in: #182533;
+      --border: #242f3d;
+    }
 
-/* Modal Style (የሚከፈቱ ሳጥኖች) */
-.modal {
-display: none;
-position: fixed;
-z-index: 2000;
-left: 0;
-top: 0;
-width: 100%;
-height: 100%;
-overflow: auto;
-background-color: rgba(0,0,0,0.7);
-}
-.modal-content {
-background-color: #fefefe;
-margin: 5% auto;
-padding: 30px;
-border: 1px solid #888;
-width: 85%;
-max-width: 850px;
-border-radius: 10px;
-box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-.close-btn {
-color: #aaa;
-float: right;
-font-size: 28px;
-font-weight: bold;
-cursor: pointer;
-}
-.close-btn:hover {
-color: black;
-}
-.modal-body {
-margin-top: 15px;
-max-height: 450px;
-overflow-y: auto;
-text-align: justify;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
 
-footer {
-background-color: #1b5e20;
-color: white;
-text-align: center;
-padding: 20px;
-margin-top: 40px;
-}
-</style>
-</head>
-<body>
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
 
-<header>
-<h1>ከምባታ (Kembata)</h1>
-<p>ወደ ከምባታ ምድር እንኳን በደህና መጡ! ሆቴሎችን፣ የቱሪዝም መስህቦችን እና ህጋዊ ወኪሎችን እዚህ ያግኙ።</p>
-</header>
+    /* Login Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(14, 22, 33, 0.95);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-<nav>
-<a href="#tourism">ቱሪዝም ቢሮ</a>
-<a href="#hotels">ሆቴሎች</a>
-<a href="#agencies">ህጋዊ ኤጀንሲዎች</a>
-<a href="#books">መጻህፍትና ታሪክ</a>
-</nav>
+    .login-card {
+      background: var(--bg-sidebar);
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
 
-<div class="container">
+    .login-card h2 {
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
 
-<!-- 1. የቱሪዝም ቢሮ ክፍል -->
-<section id="tourism" class="section-card">
-<h2 class="section-title">1. የቱሪዝም ቢሮ (Tourism Office Portal)</h2>
-<p>ከቱሪዝም ቢሮ ጋር መገናኘት፣ መረጃዎችን ማግኘትና ህጋዊ አሰራሮችን ለመከታተል እዚህ ይግቡ።</p>
-<button class="btn" onclick="alert('የቱሪዝም ቢሮ Login ገፅ በቅርብ ይመጣል!')">የቱሪዝም ቢሮ Login</button>
-</section>
+    .login-card p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
 
-<!-- 2. ሆቴሎች በየከተማው -->
-<section id="hotels" class="section-card">
-<h2 class="section-title">2. ሆቴሎችና ማረፊያዎች (Hotels & Stays)</h2>
-<p>ማደር የሚፈልጉበትን ከተማ በመምረጥ አልጋ እና አገልግሎቶችን ያስይዙ።</p>
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
 
-<div class="city-grid">
-<div class="card">
-<h3>ዱራሜ (Durame)</h3>
-<p>በዱራሜ ከተማ የሚገኙ ዋና ዋና ሆቴሎች (ኬብሮን፣ ወጆ፣ መሳላ፣ አምበርቾ ቪው...)</p>
-<button class="btn" onclick="openModal('durameHotelsModal')">ዱራሜ ሆቴሎች Login</button>
-</div>
-<div class="card">
-<h3>ሺንሺቾ (Shinshicho)</h3>
-<p>በሺንሺቾ ከተማ የሚገኙ ታዋቂ ሆቴሎችና ማረፊያዎች።</p>
-<button class="btn" onclick="openModal('shinshichoHotelsModal')">ሺንሺቾ ሆቴሎች Login</button>
-</div>
-<div class="card">
-<h3>ዳምቦያ (Damboya)</h3>
-<p>በዳምቦያ ከተማ እና አካባቢው የሚገኙ ሆቴሎችና ፔንሲዮኖች።</p>
-<button class="btn" onclick="openModal('damboyaHotelsModal')">ዳምቦያ ሆቴሎች Login</button>
-</div>
-</div>
-</section>
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
 
-<!-- 3. ህጋዊ ኤጀንሲዎች / ደላሎች -->
-<section id="agencies" class="section-card">
-<h2 class="section-title">3. ህጋዊ ኤጀንሲዎችና ደላሎች (Legal Agencies)</h2>
-<p>በከምባታ ምድር መሬት፣ ቤት ወይም ህጋዊ የደላላ አገልግሎት ሲፈልጉ በህግ የተመዘገቡና ታማኝ ወኪሎችን እዚህ ያገኛሉ። ለማጭበርበር ምቹ እንዳይሆን የሁሉም ህጋዊ ፎቶና መረጃ ተካቷል።</p>
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
 
-<button class="btn" onclick="openModal('agencyModal')">የኤጀንሲዎች Login / ዝርዝር ይመልከቱ</button>
+    .form-group input:focus {
+      border-color: var(--accent);
+    }
 
-<div class="agency-grid">
-<div class="card">
-<img src="https://via.placeholder.com/150" alt="ህጋዊ ወኪል አየለ">
-<h4>ኤጀንት 1: አየለ</h4>
-<p>ህጋዊ የመሬትና ቤት ወኪል (ዱራሜ)</p>
-<p><strong>ስልክ:</strong> +251 911 111111</p>
-<a href="tel:+251911111111" class="btn">ይደውሉ</a>
-</div>
-<div class="card">
-<img src="https://via.placeholder.com/150" alt="ህጋዊ ወኪል አበበ">
-<h4>ኤጀንት 2: አበበ</h4>
-<p>የቤትና የመኪና ደላላ (ሺንሺቾ)</p>
-<p><strong>ስልክ:</strong> +251 922 222222</p>
-<a href="tel:+251922222222" class="btn">ይደውሉ</a>
-</div>
-<div class="card">
-<img src="https://via.placeholder.com/150" alt="ህጋዊ ወኪል አድማሱ">
-<h4>ኤጀንት 3: አድማሱ</h4>
-<p>የንግድና የኢንቨስትመንት ወኪል (ዳምቦያ)</p>
-<p><strong>ስልክ:</strong> +251 933 333333</p>
-<a href="tel:+251933333333" class="btn">ይደውሉ</a>
-</div>
-</div>
-</section>
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
 
-<!-- 4. መጻህፍትና ታሪክ -->
-<section id="books" class="section-card">
-<h2 class="section-title">4. የከምባታ ታሪክና መጻህፍት (Library & History)</h2>
-<p>ስለ ከምባታ ባህል፣ አመጣጥ እና ስለ አምበርቾ ተራራ ጥንታዊ ታሪክ የሚያብራሩ መጻህፍትና መፅሄቶች።</p>
+    .btn-login:hover {
+      background: #4376aa;
+    }
 
-<div class="book-grid">
-<div class="card">
-<h3>መጽሐፍ 1: ስለ ከምባታ አመጣጥ</h3>
-<p>የከምባታ ህዝብ ጥንታዊ ታሪክ፣ ንጉሳዊ አስተዳደር እና የባህል ስርአትን የሚያብራራ ዲጂታል መጽሐፍ።</p>
-<button class="btn" onclick="openModal('book1')">መጽሐፉን ያንብቡ / Login</button>
-</div>
-<div class="card">
-<h3>መጽሐፍ 2: የአምበርቾ ስም አመጣጥና ታሪክ</h3>
-<p>የአምበርቾ ስም እንዴት እንደመጣ፣ የ 777 ደረጃዎች ሚስጥር እና የታሪክ ትረካዎች።</p>
-<button class="btn" onclick="openModal('book2')">መጽሐፉን ያንብቡ / Login</button>
-</div>
-</div>
-</section>
+    /* Main App Layout */
+    .sidebar {
+      width: 320px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
 
-</div>
+    .sidebar-header {
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid var(--border);
+    }
 
-<!-- Modal 1: የዱራሜ ሆቴሎች Login / ዝርዝር -->
-<div id="durameHotelsModal" class="modal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeModal('durameHotelsModal')">×</span>
-<h2 style="color: #1b5e20;">በዱራሜ ከተማ የሚገኙ ዋና ዋና ሆቴሎች</h2>
-<p style="color: #666; font-size: 0.9rem;">ክፍል ለማስያዝ ወይም መረጃ ለማግኘት በስልክ ቁጥራቸው ይደውሉ።</p>
-<hr><br>
-<div class="modal-body">
-<div class="city-grid">
-<div class="card">
-<h4>ኬብሮን ኢንተርናሽናል ሆቴል</h4>
-<p><strong>ከተማ:</strong> ዱራሜ</p>
-<p><strong>ስልክ:</strong> +251 997012087</p>
-<a href="tel:+251997012087" class="btn">አልጋ አስይዝ</a>
-</div>
-<div class="card">
-<h4>ወጆ ሆቴል (Wojo Hotel)</h4>
-<p><strong>ከተማ:</strong> ዱራሜ</p>
-<p><strong>ስልክ:</strong> +251 916 111111</p>
-<a href="tel:+251916111111" class="btn">አልጋ አስይዝ</a>
-</div>
-<div class="card">
-<h4>መሳላ ሆቴል</h4>
-<p><strong>ከተማ:</strong> ዱራሜ</p>
-<p><strong>ስልክ:</strong> +251 916 222222</p>
-<a href="tel:+251916222222" class="btn">አልጋ አስይዝ</a>
-</div>
-<div class="card">
-<h4>አምበርቾ ቪው ሆቴል</h4>
-<p><strong>ከተማ:</strong> ዱራሜ</p>
-<p><strong>ስልክ:</strong> +251 916 333333</p>
-<a href="tel:+251916333333" class="btn">አልጋ አስይዝ</a>
-</div>
-<div class="card">
-<h4>ምን ተስኖት ሆቴል</h4>
-<p><strong>ከተማ:</strong> ዱራሜ</p>
-<p><strong>ስልክ:</strong> +251 916 444444</p>
-<a href="tel:+251916444444" class="btn">አልጋ አስይዝ</a>
-</div>
-</div>
-</div>
-</div>
-</div>
+    .search-bar {
+      flex: 1;
+      background: var(--bg-dark);
+      border-radius: 20px;
+      padding: 8px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-<!-- Modal 2: የሺንሺቾ ሆቴሎች Login / ዝርዝር -->
-<div id="shinshichoHotelsModal" class="modal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeModal('shinshichoHotelsModal')">×</span>
-<h2 style="color: #1b5e20;">በሺንሺቾ ከተማ የሚገኙ ዋና ዋና ሆቴሎች</h2>
-<p style="color: #666; font-size: 0.9rem;">ክፍል ለማስያዝ ወይም መረጃ ለማግኘት በስልክ ቁጥራቸው ይደውሉ።</p>
-<hr><br>
-<div class="modal-body">
-<div class="city-grid">
-<div class="card">
-<h4>ኤልሻዳይ ሆቴል</h4>
-<p><strong>ከተማ:</strong> ሺንሺቾ</p>
-<p><strong>ስልክ:</strong> +251 916 555555</p>
-<a href="tel:+251916555555" class="btn">አልጋ አስይዝ</a>
-</div>
-<div class="card">
-<h4>ሺንሺቾ ግራንድ ሆቴል</h4>
-<p><strong>ከተማ:</strong> ሺንሺቾ</p>
-<p><strong>ስልክ:</strong> +251 916 666666</p>
-<a href="tel:+251916666666" class="btn">አልጋ አስይዝ</a>
-</div>
-</div>
-</div>
-</div>
-</div>
+    .search-bar input {
+      background: transparent;
+      border: none;
+      color: white;
+      outline: none;
+      width: 100%;
+    }
 
-<!-- Modal 3: የዳምቦያ ሆቴሎችና ፔንሲዮኖች Login / ዝርዝር -->
-<div id="damboyaHotelsModal" class="modal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeModal('damboyaHotelsModal')">×</span>
-<h2 style="color: #1b5e20;">በዳምቦያ ከተማ የሚገኙ ሆቴሎችና ፔንሲዮኖች</h2>
-<p style="color: #666; font-size: 0.9rem;">ክፍል ለማስያዝ ወይም መረጃ ለማግኘት በስልክ ቁጥራቸው ይደውሉ።</p>
-<hr><br>
-<div class="modal-body">
-<div class="city-grid">
-<div class="card">
-<h4>ቃልኪዳን ፔንሲዮን</h4>
-<p><strong>ከተማ:</strong> ዳምቦያ</p>
-<p><strong>ስልክ:</strong> +251 916 777777</p>
-<a href="tel:+251916777777" class="btn">አልጋ አስይዝ</a>
-</div>
-<div class="card">
-<h4>4k ፔንሲዮን</h4>
-<p><strong>ከተማ:</strong> ዳምቦያ</p>
-<p><strong>ስልክ:</strong> +251 916 888888</p>
-<a href="tel:+251916888888" class="btn">አልጋ አስይዝ</a>
-</div>
-</div>
-</div>
-</div>
-</div>
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+    }
 
-<!-- Modal: የኤጀንሲዎች Login / ዝርዝር -->
-<div id="agencyModal" class="modal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeModal('agencyModal')">×</span>
-<h2 style="color: #1b5e20;">በህግ የተመዘገቡ ህጋዊ ኤጀንቶች ዝርዝር</h2>
-<p style="color: #666; font-size: 0.9rem;">እነዚህ ኤጀንቶች በህግ የተመዘገቡ በመሆናቸው በታማኝነት ማገልገል ይችላሉ።</p>
-<hr><br>
-<div class="modal-body">
-<div class="agency-grid">
-<div class="card">
-<img src="https://via.placeholder.com/150" alt="ኤጀንት አየለ">
-<h4>ኤጀንት 1: አየለ</h4>
-<p><strong>የስራ ዘርፍ:</strong> የመሬትና የቤት ደላላ</p>
-<p><strong>አካባቢ:</strong> ዱራሜ</p>
-<p><strong>ስልክ:</strong> +251 911 111111</p>
-<p><strong>ህጋዊ ፈቃድ ቁጥር:</strong> KM-1029</p>
-<a href="tel:+251911111111" class="btn">ይደውሉ</a>
-</div>
+    .chat-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      gap: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
 
-<div class="card">
-<img src="https://via.placeholder.com/150" alt="ኤጀንት አበበ">
-<h4>ኤጀንት 2: አበበ</h4>
-<p><strong>የስራ ዘርፍ:</strong> የቤትና የመኪና አከራይ/አሻጭ</p>
-<p><strong>አካባቢ:</strong> ሺንሺቾ</p>
-<p><strong>ስልክ:</strong> +251 922 222222</p>
-<p><strong>ህጋዊ ፈቃድ ቁጥር:</strong> KM-2045</p>
-<a href="tel:+251922222222" class="btn">ይደውሉ</a>
-</div>
+    .chat-item:hover, .chat-item.active {
+      background: var(--primary);
+    }
 
-<div class="card">
-<img src="https://via.placeholder.com/150" alt="ኤጀንት አድማሱ">
-<h4>ኤጀንት 3: አድማሱ</h4>
-<p><strong>የስራ ዘርፍ:</strong> የንግድና የኢንቨስትመንት ወኪል</p>
-<p><strong>አካባቢ:</strong> ዳምቦያ</p>
-<p><strong>ስልክ:</strong> +251 933 333333</p>
-<p><strong>ህጋዊ ፈቃድ ቁጥር:</strong> KM-3081</p>
-<a href="tel:+251933333333" class="btn">ይደውሉ</a>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Modal 1: የከምባታ ታሪክ -->
-<div id="book1" class="modal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeModal('book1')">×</span>
-<h2 style="color: #1b5e20;">የከምባታ ህዝብ ታሪክና አመጣጥ</h2>
-<hr><br>
-<div class="modal-body">
-<p><strong>የከምባታ አመጣጥና ጥንታዊ ስልጣኔ፦</strong></p><br>
-<p>የከምባታ አመጣጥና ምስረታ
-የከምባታ ህዝብ ታሪክ ከክርስቶስ ልደት በፊት ከነበሩት ጥንታዊ ኩሻውያን መኖሪያዎች ጋር ይያያዛል። "ከምባታ" የሚለው ስም "ከምብ" (Kamb/Kamba) እና "ታ" (Ta) ከሚሉት ቃላት የመጣ ሲሆን፣ ፍችውም "የተሰበሰበ ህዝብ" ወይም "የጠንካሮች ሀገር" የሚል አንድነትን የሚያሳይ ትርጉም አለው።
-ከምባታ እንደ አንድ የተቀናጀና ጠንካራ መንግስት (Kingdom of Kembata) ጎልቶ የወጣው በ15ኛው ክፍለ ዘመን (በ1400ዎቹ አጋማሽ) አካባቢ በንግሥት እሌኒ ዘመነ መንግሥት ወቅት ነበር። በወቅቱ የነበሩት የከምባታ መሪዎች ከአክሱም ንጉሠ ነገሥት መንግሥትና ከደቡብ ምዕራብ የኢትዮጵያ ግዛቶች ጋር ጠንካራ የፖለቲካና የንግድ ግንኙነት ነበራቸው።
-የከምባታ ባህላዊ የማህበረሰብና የነገስታት አስተዳደር
-ከምባታ በታሪኩ በሁለት ዋና ዋና የማህበራዊ አስተዳደር ስርአቶች ይተዳደር ነበር፦
-የዎማ (Woma) ስርአት፦ "ዎማ" ማለት በከምባታ ባህል ከፍተኛው የፖለቲካና የሀይማኖት መሪ (ንጉሥ) ማለት ነው። ዎማዎች ሀገር ይመራሉ፣ ፍርድ ይሰጣሉ፣ የጦር ሰራዊት ያደራጃሉ።
-የሴራ (Sera) ስርአት፦ የከምባታ ህዝብ ዋናው የህግና የአስተዳደር መዋቅር ነው። ህዝቡ በሰላም፣ በፍትህና በእኩልነት እንዲኖር የሚያደርጉ የቃላዊ ህጎችና የባህል ድንጋጌዎች ስብስብ ነው።
-የከምባታ ታዋቂ ነገስታትና መሪዎች
-በከምባታ ታሪክ ውስጥ ታላቅ ስም የነበራቸውና ሀገር ያስተዳደሩ ነገስታት (ዎማዎች) የሚከተሉት ይገኙበታል፦
-ዎማ ኦያታ (Woma Oyata)፦ በከምባታ ታሪክ ውስጥ ከመጀመሪያዎቹና በጣም ከሚታወቁት መስራች ነገስታት አንዱ ናቸው። ግዛቱን በማስፋፋትና የከምባታን አንድነት በማጠናከር ይታወቃሉ።
-ዎማ ዴበቶ (Woma Debeto)፦ የከምባታን የወሰን ደህንነት በመጠበቅና ከጎረቤት ግዛቶች ጋር የነበረውን ግንኙነት በማስተካከል ትልቅ ሚና የተጫወቱ ንጉሥ ናቸው።
-ዎማ አዳካ (Woma Adaka)፦ በግዛታቸው ወቅት የሴራ (Sera) ባህላዊ ህግን በማጠናከርና ፍትህን በማስፈን የሚታወቁ አባት ናቸው።
-ንጉሥ ዳሞተ (King Damote)፦ ከምባታ ከአጠቃላይ የደቡብ ኢትዮጵያ ስልጣኔዎችና ከጥንታዊው የዳሞት መንግሥት ጋር በነበረው ጥብቅ ቁርኝት የሚጠቀሱ መሪ ናቸው።
-ንግሥት እሌኒ (Empress Eleni)፦ ምንምኳ የዐፄ ዘርዐ ያዕቆብ ባለቤትና የኢትዮጵያ ንጉሠ ነገሥት መንግሥት መሪ የነበሩ ቢሆንም፣ አመጣጣቸው ከከምባታ (የከምባታ ንጉሥ ልጅ) በመሆኑ በታሪክ ውስጥ ለከምባታ ትልቅ ኩራትና የፖለቲካ ጥንካሬ የሰጡ ንጉሣዊ ስብዕና ናቸው።</p>
-</div>
-</div>
-</div>
-
-<!-- Modal 2: የአምበርቾ ታሪክ -->
-<div id="book2" class="modal">
-<div class="modal-content">
-<span class="close-btn" onclick="closeModal('book2')">×</span>
-<h2 style="color: #1b5e20;">የአምበርቾ ስም አመጣጥና ታሪክ</h2>
-<hr><br>
-<div class="modal-body">
-<p><strong>የአምበርቾ ተራራ ስያሜ አመጣጥ፦</strong></p><br>
-<p>የአምበርቾ ተራራ ስያሜ አመጣጥን በተመለከተ በታሪክና በባህል ሁለት ዋና ዋና ትረካዎች ይታወቃሉ፦</p><br>
-<p><strong>የሃምበርቾ ተራራ፡ የከምባታ ህዝብ የመንፈስ፣ የታሪክ እና የማንነት ማዕከል
- የስም አመጣጥ እና ጥንታዊ መነሻ
- የመጀመሪያዎቹ 7 ጎሳዎች መገኛ (ሃምበርቾ ላማላ)፦ በከምባታ ህዝብ ቃል ታሪክ (Oral Tradition) መሰረት፣ የከምባታ ህዝብ ምስረታ የሚጀምረው ከሃምበርቾ ተራራ ነው። ጥንት "ሃምበርቾ ላማላ" (በከምባቲሳ "ላማላ" ማለት 7 ማለት ሲሆን "የሃምበርቾ ሰባቱ የከምባታ ህዝብ መነሻ ጎሳዎች") ተብለው የሚጠሩት የህዝቡ መሥራቾች በተራራው ዙሪያ ሰፍረው ይኖሩ ነበር። ከእነዚህ ሰባት ጎሳዎች በመነሳት ህዝቡ እየተስፋፋና እየተዛመተ ወደ ሌላው አካባቢ እንደተበተነ ይነገራል።
- የስሙ ትርጉም፦ "ሃምበርቾ" የሚለው ቃል በከምባቲሳ ቋንቋ የከፍታ፣ የንግስና፣ የብሔራዊ አንድነት እና የበላይነት ምሳሌ ነው። ተራራው በባህር ወለል ላይ በ3,058 ሜትር ከፍታ ላይ የሚገኝ በመሆኑና ሙሉውን አካባቢ አጉልቶ ስለሚያሳይ ይህን ስም አግኝቷል።
- የመንግሥትና የአስተዳደር ማዕከልነት (ከ16ኛው እስከ 19ኛው ክፍለ ዘመን)
-የዉማ (Woma) የንግስና ማዕከል፦ ከ16ኛው ክፍለ ዘመን ጀምሮ እስከ 19ኛው ክፍለ ዘመን ማጠቃለያ (አጼ ምኒልክ አካባቢውን ወደ ማዕከላዊ መንግስት እስከቀላቀሉበት ጊዜ) ድረስ ሃምበርቾ የከምባታ ነገሥታት (ዉማ/Woma) እና የካቢኔዎቻቸው መቀመጫ ነበር። የመጨረሻው የከምባታ ንጉሥ ዉማ ድልባቶ ደጎዬም ግዛታቸውን ያስተዳደሩት ከዚሁ ተራራ ስር ሆኖ ነበር።
- የቃለ-መሀላ ድንጋይ (Covenant Stone)፦ ከተራራው ጫፍ ላይ ነገሥታት የሚሾሙበት፣ በጎሳዎች መካከል ግጭት ሲፈጠር "ሴራ" (Seera) በተሰኘው ባህላዊ ህግ መሰረት ዕርቅ የሚወርድበት እና ትልልቅ ሀገራዊ ውሳኔዎች የሚወሰኑበት ታሪካዊ ድንጋይ ይገኛል።
- የመከላከያ ምሽግ፦ ተራራው በተፈጥሮ በተዘጋጀ ገደላማ አቀማመጡ ምክንያት በጥንት ጊዜ ከውጭ ጠላት የሚሰነዘሩ ጥቃቶችን ለመከላከል እንደ ጠንካራ ወታደራዊ ምሽግ ያገለግል ነበር።
- መንፈሳዊና ባህላዊ ፋይዳ
- የማሳላ በዓል እና አባ ሰሬቾ፦ በየዓመቱ የከምባታ ህዝብ የዘመን መለወጫ "ማሳላ" በዓል ሲከበር፣ ህዝቡ በሃምበርቾ ተራራ ላይ ይሰበሰባል። በጥንት ዘመን መንፈሳዊ መሪ የነበሩት "አባ ሰሬቾ" በተራራው ላይ ሆነው ለአካባቢውና ለህዝቡ በረከትና ሰላም ይመኙ ነበር።
- የቁጥር 7 ምስጢር፦ በከምባታ ባህል "7" ልዩና የተቀደሰ ቁጥር ነው (7 ተራራዎች፣ 7 ወንዞች፣ 7 ምንጮች፣ ሽማግሌዎች ሲላኩ 7 መሆናቸው)። ይህም ከሃምበርቾ ሰባቱ መሥራች ጎሳዎች (ሃምበርቾ ላማላ) ጋር የተያያዘ ጥልቅ ባህላዊ ምስጢር አለው።
- እንዴት የቱሪስት መስህብ ሊሆን ቻለ?
-የ777 እና የ1,500+ ደረጃዎች ግንባታ፦
-ተራራው ለዘመናት የታሪክ ማዕከል ቢሆንም፣ በዘመናዊ መልኩ የቱሪስት መስህብ የሆነው ከቅርብ ዓመታት ወዲህ ከተራራው ግርጌ እስከ ጫፉ የተገነባውን የሲሜንቱ ደረጃ ተከትሎ ነው። ከባህሉ ጋር በተያያዘ ቁጥር 7ን መሰረት በማድረግ መጀመሪያ 777 ደረጃዎች ተገንብተዋል። በ2025/2026 ደግሞ ተጨማሪ ደረጃዎች ተገንብተው አጠቃላይ ደረጃው ከ1,500 በላይ ደርሷል።
- ተፈጥሮአዊ ውበት እና ፓኖራሚክ እይታ፦
-ከተራራው ጫፍ ሲደረስ የዱራሜ ከተማን፣ ሰፊውን የምስራቅ አፍሪካ ታላቁ ስምጥ ሸለቆ፣ የፋንታሌ እና የአካባቢውን ሰንሰለታማ ተራራዎች፣ እንዲሁም የተዋቡ የገጠር እርሻዎችን በ360 ዲግሪ ሙሉ በሙሉ ለመመልከት ያስችላል።
- የስፖርት፣ የሀይኪንግ እና የኢኮ-ቱሪዝም ማዕከል፦
-አካላዊ ብቃትን ለመፈተን ደረጃዎቹን መውጣት (Mountain Hiking) ለአገር ውስጥና ለውጭ አገር ጎብኝዎች ትልቅ መስህብ ሆኗል። በአሁኑ ወቅት የዞኑ ትልቅ የስፖርት፣ የኢኮ-ቱሪዝም እና የባህል ፌስቲቫል ማዕከል ሆኖ ያገለግላል።</strong></p>
-</div>
-</div>
-</div>
-
-<footer>
-<p>© 2026 የከምባታ ዲጂታል ፕላትፎርም - መብቱ በህግ የተጠበቀ ነው።</p>
-</footer>
-
-<script>
-function openModal(id) {
-document.getElementById(id).style.display = "block";
-}
-
-function closeModal(id) {
-document.getElementById(id).style.display = "none";
-}
-
-// ከሳጥኑ ውጭ ሲነካ እንዲዘጋ የሚያደርግ
-window.onclick = function(event) {
-if (event.target.className === 'modal') {
-event.target.style.display = "none";
-}
-}
-</script>
-
-</body>
-    </html>
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
