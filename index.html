@@ -3,743 +3,626 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kilogram</title>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <title>የመጽሐፍ ቅዱስ ጥያቄ እና መልስ (100 ጥያቄዎች በ4 ደረጃዎች)</title>
     <style>
-        :root {
-            --bg-color: #17212b;
-            --side-bg: #0e1621;
-            --header-bg: #242f3d;
-            --panel-bg: #182533;
-            --text-color: #f5f5f5;
-            --hint-color: #7f91a4;
-            --link-color: #64b5ef;
-            --btn-color: #5288c1;
-            --msg-in: #182533;
-            --msg-out: #2b5278;
-            --border-color: #0f1621;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #1a365d; /* ሰማያዊ ባግራውንድ */
+            color: #ffffff;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-        }
-
-        /* Login Container */
-        .auth-container {
-            display: flex;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
-            width: 100vw;
-            position: absolute;
-            top: 0; left: 0;
-            background-color: var(--bg-color);
-            z-index: 100;
-        }
-
-        .auth-card {
-            background-color: var(--header-bg);
-            padding: 35px 25px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 360px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-
-        .kg-logo {
-            width: 75px;
-            height: 75px;
-            background: linear-gradient(135deg, #5288c1, #2b5278);
-            border-radius: 50%;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px auto;
-            font-size: 28px;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        /* ከላይ በኩል የሚታየው ጽሁፍ */
+        #banner-title {
+            color: #ffffff;
+            font-size: 1.1rem;
             font-weight: bold;
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-            text-align: left;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 14px;
-            background-color: var(--side-bg);
-            border: 1px solid #2b394a;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--btn-color);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* App View */
-        .app-view {
-            display: none;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        .app-header {
-            height: 55px;
-            background-color: var(--header-bg);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            text-align: center;
+            margin-bottom: 20px;
             padding: 0 15px;
-            border-bottom: 1px solid var(--border-color);
+            line-height: 1.6;
         }
 
-        .app-content {
-            flex: 1;
-            overflow-y: auto;
+        #quiz-container {
+            background-color: white;
+            color: #333;
+            padding: 25px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            width: 450px;
+            max-width: 90%;
+            text-align: center;
             position: relative;
         }
 
-        .page {
-            display: none;
-            height: 100%;
-            width: 100%;
-            flex-direction: column;
-        }
-
-        .page.active {
-            display: flex;
-        }
-
-        .bottom-nav {
-            height: 60px;
-            background-color: var(--header-bg);
-            display: flex;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--hint-color);
-            font-size: 11px;
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-
-        .nav-item.active {
-            color: var(--link-color);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            margin-bottom: 2px;
-        }
-
-        /* Search Bar */
-        .search-box {
-            padding: 10px 15px;
-            background-color: var(--side-bg);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 14px;
-            background-color: var(--header-bg);
-            border: 1px solid #2b394a;
-            border-radius: 20px;
-            color: white;
-            outline: none;
-            font-size: 13px;
-        }
-
-        .list-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.02);
-            cursor: pointer;
-            gap: 12px;
-        }
-
-        .list-item:hover {
-            background-color: var(--panel-bg);
-        }
-
-        .avatar {
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4ea4f4, #2b5278);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* User Header Info */
+        #user-header {
+            font-size: 14px;
             font-weight: bold;
-            font-size: 16px;
-            color: white;
-            flex-shrink: 0;
-            background-size: cover;
-            background-position: center;
+            color: #2b6cb0;
+            text-align: left;
+            margin-bottom: 12px;
+            display: none;
         }
 
-        .item-info {
-            flex: 1;
+        /* Top Panel Layout */
+        #top-panel {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #4a5568;
+            background-color: #f7fafc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
 
-        .item-info h4 {
-            font-size: 15px;
-            font-weight: 500;
+        .score-correct {
+            color: #38a169;
         }
 
-        .item-info p {
+        .score-wrong {
+            color: #e53e3e;
+        }
+
+        #timer-display {
             font-size: 13px;
-            color: var(--hint-color);
+            color: #e53e3e;
+            background-color: #fff5f5;
+            padding: 3px 8px;
+            border-radius: 10px;
+            border: 1px solid #feb2b2;
         }
 
-        /* Active Chat View */
-        .messages-container {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
+        #q-num-display {
+            font-size: 13px;
+            color: #2b6cb0;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background-color: #ebf8ff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        h2 {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.15rem;
+            line-height: 1.5;
+        }
+
+        #name-input-container {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .msg {
-            max-width: 70%;
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            word-break: break-word;
-        }
-
-        .msg img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 5px;
-        }
-
-        .msg.in { background-color: var(--msg-in); align-self: flex-start; }
-        .msg.out { background-color: var(--msg-out); align-self: flex-end; }
-
-        .chat-input-bar {
-            padding: 10px 15px;
-            background-color: var(--header-bg);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .chat-input-bar input {
-            flex: 1;
-            padding: 10px 14px;
-            background-color: var(--side-bg);
-            border: none;
-            border-radius: 20px;
-            color: white;
-            outline: none;
-        }
-
-        .attach-btn {
-            background: none;
-            border: none;
-            color: var(--hint-color);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0 5px;
-        }
-
-        /* Settings Rows */
-        .settings-group {
-            background-color: var(--side-bg);
-            margin-bottom: 15px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .settings-row {
-            display: flex;
-            align-items: center;
-            padding: 14px 15px;
-            border-bottom: 1px solid var(--border-color);
             gap: 15px;
-            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3182ce;
+        }
+
+        #start-btn {
+            padding: 12px;
+            background-color: #cbd5e0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: not-allowed;
+            transition: background-color 0.3s;
+        }
+
+        #start-btn.active {
+            background-color: #3182ce;
             cursor: pointer;
         }
 
-        /* Modal Overlays */
-        .modal-overlay {
+        #start-btn.active:hover {
+            background-color: #2b6cb0;
+        }
+
+        /* Level Selection Styles */
+        #level-section {
             display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0,0,0,0.8);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
+            margin-top: 20px;
         }
 
-        .modal-body {
-            background-color: var(--header-bg);
-            padding: 20px;
+        .level-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .level-card {
+            border: 2px solid #cbd5e0;
             border-radius: 12px;
-            width: 90%;
-            max-width: 340px;
+            padding: 15px 10px;
+            background-color: #f7fafc;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
         }
 
-        .modal-body h3 {
-            margin-bottom: 12px;
-            font-size: 16px;
+        .level-card.unlocked:hover {
+            transform: translateY(-3px);
+            border-color: #3182ce;
         }
 
-        .modal-body input {
+        .level-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #edf2f7;
+        }
+
+        .level-title {
+            font-weight: bold;
+            font-size: 15px;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .crosses {
+            font-size: 18px;
+            letter-spacing: 4px;
+        }
+
+        .cross-dim {
+            color: #cbd5e0;
+        }
+
+        .cross-bright {
+            color: #ecc94b;
+            text-shadow: 0 0 5px rgba(236, 201, 75, 0.8);
+        }
+
+        /* Game Section Styles */
+        #game-section {
+            display: none;
+        }
+
+        .option-btn {
+            display: block;
             width: 100%;
-            padding: 10px;
-            background-color: var(--side-bg);
-            border: 1px solid #2b394a;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: #e2e8f0;
+            border: none;
             border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            background-color: #cbd5e0;
+        }
+
+        .option-btn.correct {
+            background-color: #48bb78 !important;
             color: white;
-            margin-bottom: 12px;
-            outline: none;
+        }
+
+        .option-btn.wrong {
+            background-color: #f56565 !important;
+            color: white;
+        }
+
+        .nav-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .nav-btn:hover {
+            background-color: #2b6cb0;
         }
     </style>
 </head>
 <body>
 
-    <!-- Login Container -->
-    <div class="auth-container" id="authContainer">
-        <div class="auth-card">
-            <div class="kg-logo">KG</div>
-            <h2>Kilogram</h2>
-            <p id="authSubtitle" style="font-size: 13px; color: var(--hint-color); margin-bottom: 15px;">Enter details to sign in</p>
-            <form id="authForm">
-                <div class="form-group" id="nameGroup">
-                    <input type="text" id="regName" placeholder="Full Name">
-                </div>
-                <div class="form-group">
-                    <input type="tel" id="regPhone" placeholder="Phone Number (+251...)" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="regPassword" placeholder="Password" required>
-                </div>
-                <button type="submit" class="btn">LOG IN</button>
-            </form>
-        </div>
+    <!-- በሰማያዊው ባግራውንድ ላይ በነጭ ጽሁፍ የሚታየው ርዕስ -->
+    <div id="banner-title">
+        የዱ/ሀ/ቃ/ህ/ቤተክርስቲያን የተማሪዎች ህብረት የመፅሐፍ ቅዱስ ጥያቄ በተማሪ ፅናት ብርሃኑ የቀረበ
     </div>
 
-    <!-- Main Kilogram App -->
-    <div class="app-view" id="appView">
-        <div class="app-header">
-            <h3 id="headerTitle">Kilogram</h3>
-            <span style="font-size: 12px; color: var(--link-color);">online</span>
+    <div id="quiz-container">
+        <!-- በግራ በኩል በላይ የሚታይ የስም ማሳያ -->
+        <div id="user-header"></div>
+
+        <!-- ከላይ በኩል ነጥብ እና ሰከንድ ማሳያ ፓነል -->
+        <div id="top-panel">
+            <span class="score-correct">ተመለሰ: <span id="correct-count">0</span></span>
+            <span class="score-wrong">አልተመለሰም: <span id="wrong-count">0</span></span>
+            <span id="timer-display">⏱ 30s</span>
         </div>
 
-        <div class="app-content">
-            <!-- PAGE 1: CHATS -->
-            <div class="page active" id="pageChats">
-                <div style="padding: 10px; color: var(--hint-color); font-size: 12px;">DIRECT CHATS</div>
-                <div id="chatsListContainer"></div>
+        <!-- ስም ማስገቢያ ክፍል -->
+        <div id="name-section">
+            <h2>እንኳን ደህና መጡ!</h2>
+            <div id="name-input-container">
+                <input type="text" id="username-input" placeholder="ስምዎን ያስገቡ" oninput="validateInput()">
+                <button id="start-btn" onclick="goToLevelSelection()" disabled>ጀምር</button>
             </div>
+        </div>
 
-            <!-- PAGE 2: CONTACTS -->
-            <div class="page" id="pageContacts">
-                <div class="search-box">
-                    <input type="text" id="contactSearchInput" placeholder="🔍 Search contacts by name or phone..." onkeyup="filterContacts()">
+        <!-- የደረጃዎች መምረጫ ክፍል -->
+        <div id="level-section">
+            <h2 id="level-welcome-text">ደረጃ ይምረጡ</h2>
+            <div class="level-grid">
+                <div id="level-card-1" class="level-card unlocked" onclick="startLevel(1)">
+                    <div class="level-title">ደረጃ 1</div>
+                    <div id="crosses-1" class="crosses">
+                        <span class="cross-dim">✝</span><span class="cross-dim">✝</span><span class="cross-dim">✝</span>
+                    </div>
                 </div>
-                <div style="padding: 10px; color: var(--hint-color); font-size: 12px;">CONTACTS ON KILOGRAM</div>
-                <div id="contactsListContainer"></div>
-            </div>
-
-            <!-- PAGE 3: SETTINGS -->
-            <div class="page" id="pageSettings" style="padding: 15px; overflow-y: auto;">
-                <div class="settings-group">
-                    <div class="settings-row" onclick="openModal('modalAccount')"><span>👤</span> Account (Name, Number, Bio)</div>
-                    <div class="settings-row" onclick="openModal('modalChatSettings')"><span>💬</span> Chat Settings (Wallpaper, Theme)</div>
-                    <div class="settings-row" onclick="openModal('modalPrivacy')"><span>🔒</span> Privacy and Security (Change Password)</div>
-                    <div class="settings-row" onclick="openModal('modalNotifications')"><span>🔔</span> Notifications and Sounds</div>
-                    <div class="settings-row"><span>📁</span> Chat Folders</div>
-                    <div class="settings-row"><span>📱</span> Devices</div>
-                    <div class="settings-row"><span>⚡</span> Power Saving</div>
-                    <div class="settings-row"><span>🌐</span> Language</div>
+                <div id="level-card-2" class="level-card locked" onclick="startLevel(2)">
+                    <div class="level-title">ደረጃ 2</div>
+                    <div id="crosses-2" class="crosses">
+                        <span class="cross-dim">✝</span><span class="cross-dim">✝</span><span class="cross-dim">✝</span>
+                    </div>
                 </div>
-            </div>
-
-            <!-- PAGE 4: PROFILE -->
-            <div class="page" id="pageProfile" style="padding: 20px; text-align: center;">
-                <div class="avatar" id="profAvatar" style="width: 80px; height: 80px; font-size: 28px; margin: 0 auto 15px auto;">KG</div>
-                <h2 id="profName">Tsinat</h2>
-                <p id="profPhone" style="color: var(--hint-color); margin-bottom: 8px;">+251 984287111</p>
-                <p id="profBio" style="color: var(--link-color); font-size: 13px; margin-bottom: 20px;">Available</p>
-                <div class="settings-group" style="text-align: left;">
-                    <div class="settings-row">🎂 Birthday: July 07, 2008</div>
+                <div id="level-card-3" class="level-card locked" onclick="startLevel(3)">
+                    <div class="level-title">ደረጃ 3</div>
+                    <div id="crosses-3" class="crosses">
+                        <span class="cross-dim">✝</span><span class="cross-dim">✝</span><span class="cross-dim">✝</span>
+                    </div>
                 </div>
-            </div>
-
-            <!-- ACTIVE PRIVATE CHAT -->
-            <div class="page" id="pageActiveChat">
-                <div class="messages-container" id="msgContainer"></div>
-                <div class="chat-input-bar">
-                    <input type="file" id="mediaFileInput" accept="image/*,application/pdf,.doc,.docx,.txt" style="display: none;" onchange="sendMediaFile(this)">
-                    <button class="attach-btn" onclick="document.getElementById('mediaFileInput').click()">📎</button>
-                    <input type="text" id="chatInput" placeholder="Write a message...">
-                    <button class="btn" onclick="sendMsg()" style="width: auto; padding: 8px 15px; margin:0;">➤</button>
+                <div id="level-card-4" class="level-card locked" onclick="startLevel(4)">
+                    <div class="level-title">ደረጃ 4</div>
+                    <div id="crosses-4" class="crosses">
+                        <span class="cross-dim">✝</span><span class="cross-dim">✝</span><span class="cross-dim">✝</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar -->
-        <div class="bottom-nav">
-            <button class="nav-item active" onclick="switchNav('Chats')">
-                <span class="nav-icon">💬</span>
-                Chats
-            </button>
-            <button class="nav-item" onclick="switchNav('Contacts')">
-                <span class="nav-icon">📇</span>
-                Contacts
-            </button>
-            <button class="nav-item" onclick="switchNav('Settings')">
-                <span class="nav-icon">⚙️</span>
-                Settings
-            </button>
-            <button class="nav-item" onclick="switchNav('Profile')">
-                <span class="nav-icon">👤</span>
-                Profile
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL 1: EDIT ACCOUNT -->
-    <div class="modal-overlay" id="modalAccount">
-        <div class="modal-body">
-            <h3>Edit Account Info</h3>
-            <input type="text" id="editNameInput" placeholder="New Name">
-            <input type="tel" id="editPhoneInput" placeholder="New Phone Number">
-            <input type="text" id="editBioInput" placeholder="New Bio">
-            <button class="btn" onclick="saveAccountInfo()">Save Changes</button>
-            <button class="btn" onclick="closeModal('modalAccount')" style="background-color: #2b394a; margin-top: 5px;">Cancel</button>
-        </div>
-    </div>
-
-    <!-- MODAL 2: CHAT WALLPAPER -->
-    <div class="modal-overlay" id="modalChatSettings">
-        <div class="modal-body">
-            <h3>Chat Wallpaper</h3>
-            <p style="font-size: 12px; color: var(--hint-color); margin-bottom: 10px;">Select an image from device for Chat Background:</p>
-            <input type="file" id="wallpaperFileInput" accept="image/*" style="display: block;">
-            <button class="btn" onclick="applyWallpaper()">Apply Wallpaper</button>
-            <button class="btn" onclick="closeModal('modalChatSettings')" style="background-color: #2b394a; margin-top: 5px;">Cancel</button>
-        </div>
-    </div>
-
-    <!-- MODAL 3: CHANGE PASSWORD -->
-    <div class="modal-overlay" id="modalPrivacy">
-        <div class="modal-body">
-            <h3>Change Password</h3>
-            <input type="password" id="newPasswordInput" placeholder="Enter New Password">
-            <button class="btn" onclick="saveNewPassword()">Update Password</button>
-            <button class="btn" onclick="closeModal('modalPrivacy')" style="background-color: #2b394a; margin-top: 5px;">Cancel</button>
-        </div>
-    </div>
-
-    <!-- MODAL 4: NOTIFICATIONS -->
-    <div class="modal-overlay" id="modalNotifications">
-        <div class="modal-body">
-            <h3>Notifications</h3>
-            <p style="font-size: 13px; margin-bottom: 15px;">🔔 Notifications: Active</p>
-            <p style="font-size: 13px; margin-bottom: 15px;">🔊 Message Tones: Enabled</p>
-            <button class="btn" onclick="closeModal('modalNotifications')">OK</button>
+        <!-- የጨዋታው ክፍል -->
+        <div id="game-section">
+            <div id="q-num-display"></div>
+            <h2 id="question-text">ጥያቄ እየተጫነ ነው...</h2>
+            <div id="options-container"></div>
+            <div>
+                <button id="next-btn" class="nav-btn" onclick="nextQuestion()">ቀጣይ</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const BOT_TOKEN = "YOUR_BOT_TOKEN";
-        const CHAT_ID = "YOUR_CHAT_ID";
+        const quizData = [
+            // ደረጃ 1 (1-25) - ብሉይ ኪዳን ክፍል 1
+            { question: "1. አዳምና ሄዋን የተፈጠሩበትና የተቀመጡበት ገነት ማን ይባላል?", options: ["የዔደን ገነት", "የገሊላ ገነት", "የሲና ገነት", "የዘይት ገነት"], correct: 0 },
+            { question: "2. አዳምና ሄዋን ከእግዚአብሔር የታዘዙትን ትእዛዝ ተላልፈው የበሉት ፍሬ ምን ነበር?", options: ["የሕይወት ዛፍ", "መልካም፤ና ክፉን የሚያስታውቅ ዛፍ", "የበለስ ዛፍ", "የወይራ ዛፍ"], correct: 1 },
+            { question: "3. እግዚአብሔር አዳምን ከምን ፈጠረው?", options: ["ከእሳት", "ከወርቅ", "ከመሬት አፈር", "ከውኃ"], correct: 2 },
+            { question: "4. ሄዋን ከአዳም ከየትኛው የሰውነት ክፍል ተፈጠረች?", options: ["ከእጁ", "ከጎኑ አጥንት", "ከእግሩ", "ከተከሻው"], correct: 1 },
+            { question: "5. ኖህ እግዚአብሔር ባዘዘው መሠረት የሰራው ትልቅ መርከብ ከምን እንጨት ተሰራ?", options: ["ከጎፈር እንጨት", "ከወይራ እንጨት", "ከዋርካ እንጨት", "ከጥርሴ እንጨት"], correct: 0 },
+            { question: "6. በኖህ ዘመን የነበረው የጥፋት ውኃ ለስንት ቀንና ሌሊት ዘነበ?", options: ["7 ቀንና 7 ሌሊት", "40 ቀንና 40 ሌሊት", "100 ቀን", "120 ቀን"], correct: 1 },
+            { question: "7. የጥፋት ውኃ መጎደሉን ለማወቅ ኖህ ከመልእክተኛው ቁራ በኋላ የላካት ወፍ ማን ነበረች?", options: ["ርግብ", "ጭልፊት", "ድንቢጥ", "ጉጉት"], correct: 0 },
+            { question: "8. ከጥፋት ውኃ በኋላ እግዚአብሔር ለዓለም የገባውን ቃል ኪዳን ለማሳየት በደመና ያደረገው ምልክት ምንድን ነው?", options: ["ቀስተ ደመና", "ኮከብ", "የእሳት ዓምድ", "መብረቅ"], correct: 0 },
+            { question: "9. የሳምሶን እናትና አባት የትኛው ነገድ ነበሩ?", options: ["የይሁዳ ነገድ", "የዳን ነገድ", "የብንያም ነገድ", "የሌዊ ነገድ"], correct: 1 },
+            { question: "10. ሳምሶን በልጅነቱ እግዚአብሔር የተለየ ናዝራዊ እንዲሆን በመሆኑ ምን እንዲያደርግ አልተፈቀደለትም ነበር?", options: ["ጠጅ እንዲጠጣና ጸጉሩ እንዲላጭ", "ሥጋ እንዲበላ", "እንጀራ እንዲበላ", "ጫማ እንዲያደርግ"], correct: 0 },
+            { question: "11. ሳምሶን ኃይሉ ያለው በየትኛው የሰውነት ክፍሉ ላይ ነበር?", options: ["በእጁ", "በጸጉሩ", "በእግሩ", "በደረቱ"], correct: 1 },
+            { question: "12. ሳምሶንን አታልላ የኃይሉን ምስጢር ለፍልስጥኤማውያን አሳልፋ የሰጠችው ሴት ማን ትባላለች?", options: ["ደሊላ", "ሬካብ", "ሩት", "አስቴር"], correct: 0 },
+            { question: "13. ሙሴ እስራኤላውያንን ከግብጽ ባርነት ሲያወጣ የቀይ ባሕርን የከፈለው በምን ነበር?", options: ["በእጁ", "በበትሩ", "በድንጋይ", "በሰይፍ"], correct: 1 },
+            { question: "14. እግዚአብሔር ለሙሴ አሥርቱን ትእዛዛት የሰጠው በየትኛው ተራራ ላይ ነው?", options: ["በሲና ተራራ", "በጽዮን ተራራ", "በደብረ ዘይት ተራራ", "በቀርሜሎስ ተራራ"], correct: 0 },
+            { question: "15. ሙሴ እግዚአብሔርን በመጀመሪያ ያየው በምን መልክ ነበር?", options: ["በደመና", "በሚነድ እሾህ ቁጥቋጦ ውስጥ", "በውኃ ላይ", "በታላቅ ነፋስ"], correct: 1 },
+            { question: "16. እስራኤላውያን በምድረ በዳ ጉዞአቸው ወቅት እግዚአብሔር ከሰማይ ያወረደላቸው ምግብ ምን ይባላል?", options: ["መና", "በለስ", "ዘቢብ", "ኅብስት"], correct: 0 },
+            { question: "17. አብርሃም እግዚአብሔርን ታዝዞ ልጁን ይስሐቅን መሥዋዕት ለማድረግ የሄደበት ተራራ ማን ይባላል?", options: ["ሞሪያ ተራራ", "ሲና ተራራ", "አራራት ተራራ", "ደብረ ታቦር"], correct: 0 },
+            { question: "18. እግዚአብሔር ለአብርሃም የገባለት ዋና ቃል ኪዳን ምን ነበር?", options: ["ዘሩ እንደ ሰማይ ኮከብ እንደሚበዛ", "ትልቅ ንጉሥ እንደሚሆን", "ሀብታም እንደሚሆን", "ረጅም ዕድሜ እንደሚኖር"], correct: 0 },
+            { question: "19. የአብርሃም የመጀመሪያው ልጅ (ከአጋር የወለደው) ማን ይባላል?", options: ["እስማኤል", "ይስሐቅ", "ያዕቆብ", "ዔሳው"], correct: 0 },
+            { question: "20. አብርሃም ከካራን ምድር ሲወጣ ዕድሜው ስንት ነበር?", options: ["50 ዓመት", "75 ዓመት", "100 ዓመት", "120 ዓመት"], correct: 1 },
+            { question: "21. ይስሐቅ ያገባትና የያዕቆብና የዔሳው እናት የሆነችው ሴት ማን ትባላለች?", options: ["ርብቃ", "ሳራ", "ራሔል", "ልያ"], correct: 0 },
+            { question: "22. የይስሐቅ የሁለቱ መንትያ ልጆች ስም ማን ይባላል?", options: ["ዔሳውና ያዕቆብ", "ማናሴና ኤፍሬም", "ቃየንና አቤል", "ይሁዳና ሮቤል"], correct: 0 },
+            { question: "23. ይስሐቅ በሸመገለ ጊዜ ዔሳውን ለመባረክ ሲፈልግ ያዕቆብ የበኩርናውን ምርቃት በምን ተቀበለው?", options: ["በምግብና በለመለመ የፍየል ቁርበት በመሸፈን", "በወርቅ", "በሰይፍ", "በፈረስ"], correct: 0 },
+            { question: "24. ዮሴፍ በወንድሞቹ ተጠልቶ ለግብጽ ነጋዴዎች በስንት ብር ተሸጠ?", options: ["በ20 የብር ሳንቲም", "በ30 የብር ሳንቲም", "በ50 የብር ሳንቲም", "በ100 የብር ሳንቲም"], correct: 0 },
+            { question: "25. ዮሴፍ በግብጽ አገር የፈርዖንን ሕልም በመፍታቱ የተሰጠው ማዕረግ ምን ነበር?", options: ["የግብጽ ሁለተኛ ገዢ (ጠቅላይ ሚኒስትር)", "የወታደር አዛዥ", "የእስር ቤት ጠባቂ", "የንጉሥ አጋፋሪ"], correct: 0 },
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCprETwo0XY8LI17AF2r0sRew66jytqwoA",
-            authDomain: "kilogram-f0e2c.firebaseapp.com",
-            databaseURL: "https://kilogram-f0e2c-default-rtdb.firebaseio.com",
-            projectId: "kilogram-f0e2c",
-            storageBucket: "kilogram-f0e2c.firebasestorage.app",
-            messagingSenderId: "544016751725",
-            appId: "1:544016751725:web:1c29278df2eb488215b364",
-            measurementId: "G-TNVZ6VVCG5"
-        };
+            // ደረጃ 2 (26-50) - ብሉይ ኪዳን ክፍል 2
+            { question: "26. ዮሴፍ በግብጽ እያለ በሀሰት ተወንጅሎ የታሰረበት የጌታው ስም ማን ይባላል?", options: ["ጶጢፋር", "ፈርዖን", "ሃማን", "ቀርኔሌዎስ"], correct: 0 },
+            { question: "27. የዮሴፍ አባት ያዕቆብ ለዮሴፍ ልዩ አድርጎ የሰራለት አልባስ ምን ነበር?", options: ["ኅብር እጅጌ ያለው ቀሚስ", "የወርቅ ዘውድ", "የቆዳ ጃኬት", "የሐር መጎናጸፊያ"], correct: 0 },
+            { question: "28. ዳዊት ግዙፉን የፍልስጥኤም ተዋጊ ጎልያድን የጣለው በምን ነበር?", options: ["በወንጭፍና በወንዝ ድንጋይ", "በሰይፍ", "በጦር", "በቀስት"], correct: 0 },
+            { question: "29. ንጉሥ ዳዊት እስራኤልን ከመንገሡ በፊት የነበረው የሥራ ድርሻ ምን ነበር?", options: ["እረኛ", "አናጢ", "ገበሬ", "ነጋዴ"], correct: 0 },
+            { question: "30. ንጉሥ ዳዊት የእስራኤል ዋና ከተማ አድርጎ የመረጣት ከተማ የትኛዋ ናት?", options: ["ኢየሩሳሌም", "ቤተልሔም", "ኬብሮን", "ሰማርያ"], correct: 0 },
+            { question: "31. ዳዊት በገና እየተጫወተ ክፉ መንፈስ ያርቅለት የነበረው ንጉሥ ማን ነበር?", options: ["ሳኦል", "ሰሎሞን", "ሮብዓም", "አክዓብ"], correct: 0 },
+            { question: "32. ዳንኤል እግዚአብሔርን በማምለኩ ምክንያት የተጣለው ወዴት ውስጥ ነበር?", options: ["በአንበሶች ጉድጓድ ውስጥ", "በሚነድ እሳት ውስጥ", "በቀይ ባሕር ውስጥ", "በእስር ቤት"], correct: 0 },
+            { question: "33. ንጉሥ ናቡከደነፆር ካያቸው ሕልሞች አንዱን የተረጎመለት ነቢይ ማን ነው?", options: ["ዳንኤል", "ኢሳይያስ", "ኤርምያስ", "ህዝቅኤል"], correct: 0 },
+            { question: "34. ከዳንኤል ጋር በባቢሎን የነበሩት ሦስቱ ጓደኞቹ (ሲድራቅ፣ ሚሳቅ፣ አብደናጎ) ወዴት ተጣሉ?", options: ["በሚነድ የእሳት እቶን ውስጥ", "በአንበሳ ጉድጓድ", "በውኃ ጉድጓድ", "በወህኒ ቤት"], correct: 0 },
+            { question: "35. ንጉሥ ሰሎሞን ከእግዚአብሔር ዘንድ ምን እንዲሰጠው ለመነ?", options: ["ጥበብና አስተዋይ ልብ", "ሀብትና ንብረት", "የጠላቶቹን ነፍስ", "ረጅም ዕድሜ"], correct: 0 },
+            { question: "36. ንጉሥ ሰሎሞን በኢየሩሳሌም የሰራው ታላቅ ሕንፃ ምንድን ነው?", options: ["የእግዚአብሔር ቤተ መቅደስ", "የፈርዖን ቤተ መንግሥት", "የባቢሎን ግንብ", "የግብጽ pyramid"], correct: 0 },
+            { question: "37. የሰሎሞንን ጥበብና ሀብት ለመመልከት ከሩቅ የመጣችው ንግሥት ማን ትባላለች?", options: ["የሳባ ንግሥት", "ንግሥት አስቴር", "ንግሥት ኢዛቤል", "ንግሥት አታልያ"], correct: 0 },
+            { question: "38. ነቢዩ ህዝቅኤል በራእዩ ያየው የታላቁ ሸለቆ እይታ ምን ነበር?", options: ["የደረቁ አጥንቶች በሕይወት መቆማቸውን", "የጥፋት ውኃን", "የእሳት ዓምድን", "የባቢሎን ውደቀትን"], correct: 0 },
+            { question: "39. ነቢዩ ህዝቅኤል በባቢሎን ምርኮ በነበረበት ጊዜ በየትኛው ወንዝ አጠገብ ሳለ ነው ራእይ ያየው?", options: ["በኮባር ወንዝ", "በዮርዳኖስ ወንዝ", "በኤፍራጥስ ወንዝ", "በናይል ወንዝ"], correct: 0 },
+            { question: "40. ጻድቁ ኢዮብ በደረሰበት ታላቅ መከራና ፈተና ሁሉ ምን አላደረገም?", options: ["በአፉ አልበደለም፤ እግዚአብሔርንም አልሰደበም", "አላለቀሰም", "ከቤቱ አልወጣም", "ከወዳጆቹ ጋር አልተናገረም"], correct: 0 },
+            { question: "41. ኢዮብ ይኖርበት የነበረው ምድር ማን ይባላል?", options: ["ዔፅ ምድር", "ከነዓን ምድር", "ሚድያን ምድር", "ሞአብ ምድር"], correct: 0 },
+            { question: "42. ኢዮብ ከመከራው በኋላ እግዚአብሔር የቀደመውን ሀብቱንና ንብረቱን በስንት እጥፍ አድርጎ ባረከው?", options: ["በሁለት እጥፍ (እጥፍ ድርብ)", "በሦስት እጥፍ", "በአራት እጥፍ", "በአምስት እጥፍ"], correct: 0 },
+            { question: "43. ነህምያ በፋርስ ንጉሥ አርጣክስስታስ ቤተ መንግሥት የነበረው የሥራ ድርሻ ምን ነበር?", options: ["የንጉሡ አጠጣች (አጋፋሪ)", "የወታደር አዛዥ", "ጸሐፊ", "የበሬ እረኛ"], correct: 0 },
+            { question: "44. ነህምያ ወደ ኢየሩሳሌም ተመልሶ የሰራውና ያደሰው ምንድን ነው?", options: ["የኢየሩሳሌምን ቅጽር (ግንብ)", "የሰሎሞንን ቤተ መንግሥት", "የታቦቱን ድንኳን", "የንጉሡን ዙፋን"], correct: 0 },
+            { question: "45. ነህምያ የኢየሩሳሌምን ግንብ ሰርቶ ለማጠናቀቅ ስንት ቀን ፈጀበት?", options: ["52 ቀን", "100 ቀን", "40 ቀን", "120 ቀን"], correct: 0 },
+            { question: "46. ትንቢተ ሰፎንያስ በብሉይ ኪዳን መጻሕፍት ውስጥ ከየትኞቹ ነቢያት ወገን ይመደባል?", options: ["ከንኡሳን (ታናናሽ) ነቢያት", "ከዐበይት (ታላላቅ) ነቢያት", "ከታሪክ መጻሕፍት", "ከሕግ መጻሕፍት"], correct: 0 },
+            { question: "47. በትንቢተ ሰፎንያስ መሠረት 'የእግዚአብሔር ቀን' ምን ዓይነት ቀን እንደሆነ ተገልጿል?", options: ["የመዓትና የመከራ ቀን", "የሰርግ ቀን", "የደስታ ቀን", "የምህረት ቀን ብቻ"], correct: 0 },
+            { question: "48. በትንቢተ ሰፎንያስ ምዕራፍ 3 ላይ እግዚአብሔር ለአሕዛብ ሁሉ ምን ዓይነት አንደበትን እንደሚመልስ ተናግሯል?", options: ["ንጹሕ አንደበትን", "የዕብራይስጥ ቋንቋን", "የግሪክ ቋንቋን", "የጸጥታ አንደበትን"], correct: 0 },
+            { question: "49. ሰፎንያስ በነበየበት ዘመን የይሁዳ ንጉሥ የነበረው ማነው?", options: ["ኢዮስያስ", "ሕዝቅያስ", "ምናሴ", "አካዝ"], correct: 0 },
+            { question: "50. የሰፎንያስ አባት ማን ይባላል?", options: ["ኩሺ", "ሐናንያ", "አሞጽ", "በቅያ"], correct: 0 },
 
-        let db = null;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-        } catch(e){}
+            // ደረጃ 3 (51-75) - አዲስ ኪዳን ክፍል 1
+            { question: "51. በወንጌላዊው ማቴዎስ መጽሐፍ መሠረት የኢየሱስ ክርስቶስ የትውልድ ሐረግ ከማን ይጀምራል?", options: ["ከአብርሃምና ከዳዊት", "ከሙሴ", "ከኖህ", "ከሰሎሞን"], correct: 0 },
+            { question: "52. በማቴዎስ ወንጌል ኢየሱስ በደብረ ዘይት ተራራ ላይ የሰጠው ስብከት ምን ይባላል?", options: ["የተራራው ስብከት (ብፁዓን)", "የምሳሌ ስብከት", "የቃና ስብከት", "የሲና ስብከት"], correct: 0 },
+            { question: "53. የማርቆስ ወንጌል ምልክት ተደርጎ የሚወሰደው እንስሳ የትኛው ነው?", options: ["አንበሳ", "ላም", "ሰው", "ንሥር"], correct: 0 },
+            { question: "54. በማርቆስ ወንጌል መሠረት ኢየሱስ በመስቀል ላይ እያለ መጨረሻ ላይ የተናገረው ቃል ምንድን ነው?", options: ["ኤሎሄ ኤሎሄ ላማ ሰበቅታኒ", "ተፈጸመ", "አባት ሆይ ነፍሴን በእጅህ አደራ እሰጣለሁ", "ተጠማሁ"], correct: 0 },
+            { question: "55. የሉቃስ ወንጌል ጸሐፊ የሆነው ሉቃስ የመጀመሪያ የሥራ ሙያው ምን ነበር?", options: ["ሐኪም (ባለ መድኃኒት)", "ቀራጭ", "አregular ዓሣ አጥማጅ", "ጸሐፊ"], correct: 0 },
+            { question: "56. በሉቃስ ወንጌል ምዕራፍ 15 ላይ የሚገኘው ታዋቂው ምሳሌ የትኛው ነው?", options: ["የጠፋው ልጅ (አባካኙ ልጅ) ምሳሌ", "የዘሪው ምሳሌ", "የሰናፍጭ ቅንጣት ምሳሌ", "የአሥሩ ደናግል ምሳሌ"], correct: 0 },
+            { question: "57. በዮሐንስ ወንጌል መሠረት ኢየሱስ ያደረገው የመጀመሪያው ታምር ምንድን ነው?", options: ["ውኃውን ወደ ወይን ጠጅ መለወጥ", "አልዓዛርን ማስሳት", "ዓወር ማብራት", "በውኃ ላይ መሄድ"], correct: 0 },
+            { question: "58. በዮሐንስ ወንጌል 'በመጀመሪያ ቃል ነበረ...' ብሎ የሚጀምረው ምዕራፍ የትኛው ነው?", options: ["ምዕራፍ 1", "ምዕራፍ 3", "ምዕራፍ 5", "ምዕራፍ 10"], correct: 0 },
+            { question: "59. በዮሐንስ ወንጌል 3:16 መሠረት እግዚአብሔር ዓለምን ያህል የወደደው እስከ ምን ድረስ ነው?", options: ["አንድያ ልጁን እስኪሰጥ ድረስ", "መላእክትን እስኪልክ ድረስ", "ሀብት እስኪሰጥ ድረስ", "ዓለምን እስኪያጠፋ ድረስ"], correct: 0 },
+            { question: "60. ሐዋርያው ጳውሎስ ክርስቲያኖችን ለማሰር ወደ ደማስቆ ሲሄድ በ his መንገድ ላይ ምን ሆነ?", options: ["ታላቅ ብርሃን ከሰማይ በራበት፤ የኢየሱስንም ድምፅ ሰማ", "አንበሳ አገኘው", "በወንበዴዎች ተመታ", "ታመመ"], correct: 0 },
+            { question: "61. ሐዋርያው ጳውሎስ ከመለወጡ በፊት ይባል የነበረው ስም ማን ነበር?", options: ["ሳኦል", "ስምዖን", "ስጢፋኖስ", "በርናባስ"], correct: 0 },
+            { question: "62. ሐዋርያው ጳውሎስ ለሮሜ ሰዎች በጻፈው መልእክት 'የኃጢአት ደሞዝ ... ነው' ብሏል?", options: ["ሞት", "ሕይወት", "ደስታ", "ሀብት"], correct: 0 },
+            { question: "63. በሮሜ መልእክት 8:31 መሠረት 'እግዚአብሔር ከእኛ ጋር ከሆነ ...'?", options: ["ማን ይቃወመናል?", "ሀብታም እንሆናለን", "አንታመመም", "ማንም አይወደንም"], correct: 0 },
+            { question: "64. በ1ኛ ቆሮንቶስ ምዕራፍ 13 ላይ ጳውሎስ ከእምነትና ከተስፋ የሚበልጠው ታላቅ ስጦታ ማነው ብሏል?", options: ["ፍቅር", "ጥበብ", "ት ትንቢት", "እውቀት"], correct: 0 },
+            { question: "65. በ1ኛ ቆሮንቶስ 6:19 መሠረት የክርስቲያን አካል የትኛው ማደሪያ ነው?", options: ["የመንፈስ ቅዱስ ቤተ መቅደስ", "የመላእክት ቤት", "የዓለም ቤት", "የአፈር ቤት"], correct: 0 },
+            { question: "66. በኤፌሶን መልእክት ምዕራፍ 6 ላይ የተገለጸው 'የእግዚአብሔር የጦር ዕቃ' ዓላማ ምንድን ነው?", options: ["የዲያብሎስን ሽንገላ ለመቃወም", "ሰዎችን ለመውጋት", "ሀብት ለማግኘት", "ንጉሥ ለመሆን"], correct: 0 },
+            { question: "67. በኤፌሶን 2:8 መሠረት እኛ የዳንነው በምን አማካኝነት ነው?", options: ["በጸጋው በእምነት", "በሥራችን ብቻ", "በወርቃችን", "በትምህርታችን"], correct: 0 },
+            { question: "68. የይሁዳ መልእክት ዋና ዓላማ ክርስቲያኖች ስለ ምን እንዲታገሉ ለማሳሰብ ነው?", options: ["አንዴ ፈጽሞ ስለተሰጠ እምነት እንዲጋደሉ", "ስለ ፖለቲካ", "ስለ ሀብት", "ስለ ንግድ"], correct: 0 },
+            { question: "69. በይሁዳ መልእክት ውስጥ የመላእክት አለቃ ሚካኤል ከዲያብሎስ ጋር የተከራከረው ስለ ማነው ሥጋ ነበር?", options: ["ስለ ሙሴ ሥጋ", "ስለ አብርሃም ሥጋ", "ስለ ዳዊት ሥጋ", "ስለ ኤልያስ ሥጋ"], correct: 0 },
+            { question: "70. የዮሐንስ ራእይ መጽሐፍ የተጻፈው ዮሐንስ በየትኛው ደሴት ታስሮ በነበረበት ጊዜ ነው?", options: ["በፍጥሞ ደሴት", "በቆጵሮስ ደሴት", "በቀርጤስ ደሴት", "በማልታ ደሴት"], correct: 0 },
+            { question: "71. በራእይ መጽሐፍ ኢየሱስ ክርስቶስ 'አልፋና ...' ነኝ ብሏል?", options: ["ዖሜጋ", "ቤታ", "ጋማ", "ዜታ"], correct: 0 },
+            { question: "72. በራእይ ምዕራፍ 21 ላይ ከሰማይ የምትወርደው አዲሷ ከተማ ማን ትባላለች?", options: ["አዲሲቱ ኢየሩሳሌም", "አዲሲቱ ባቢሎን", "አዲሲቱ ጽዮን", "አዲሲቱ ቤተልሔም"], correct: 0 },
+            { question: "73. ጳውሎስ ለቆሮንቶስ ሰዎች በ2ኛ መልእክቱ 'በክርስቶስ ያለ አዲስ ... ነው' ብሏል?", options: ["ፍጥረት", "ንጉሥ", "ሐዋርያ", "መምህር"], correct: 0 },
+            { question: "74. በማቴዎስ ወንጌል መሠረት ኢየሱስ የተጠመቀበት ወንዝ የትኛው ነው?", options: ["የዮርዳኖስ ወንዝ", "የኤፍራጥስ ወንዝ", "የአባይ ወንዝ", "የጊሆን ወንዝ"], correct: 0 },
+            { question: "75. ኢየሱስን አጥምቆ የተናገረውና 'የእግዚአብሔር በግ' ያለው ማን ነው?", options: ["ዮሐንስ መጥምቅ", "ሐዋርያው ዮሐንስ", "ጴጥሮስ", "እስጢፋኖስ"], correct: 0 },
 
-        let myUser = null;
-        let activeChatTargetId = null;
-        let activeChatRoomId = null;
-        let msgListener = null;
-        let contactsCache = [];
+            // ደረጃ 4 (76-100) - አዲስ ኪዳን ክፍል 2
+            { question: "76. በማቴዎስ 28:19 መሠረት ኢየሱስ ለሐዋርያት የሰጠው ታላቅ ተልዕኮ ምንድን ነው?", options: ["ሂዱና አሕዛብን ሁሉ በአብ በወልድ በመንፈስ ቅዱስ ስም እያጠመቃችኋቸው ደቀ መዛሙርት አድርጓቸው", "ቤተ መቅደስ ስሩ", "ንጉሥ ሁኑ", "ጦርነት አድርጉ"], correct: 0 },
+            { question: "77. የኢየሱስ እናት ማርያም አጮሃው የነበረው እጮኛዋ ማን ይባላል?", options: ["ዮሴፍ", "ዘካርያስ", "ስምዖን", "ቆርኔሌዎስ"], correct: 0 },
+            { question: "78. በማርቆስ ወንጌል ኢየሱስ አምስት እንጀራና ሁለት ዓሣ አበርክቶ ስንት ሕዝብ አጠገበ?", options: ["አምስት ሺህ (5000) ወንዶች", "ሦስት ሺህ", "አሥር ሺህ", "አንድ ሺህ"], correct: 0 },
+            { question: "79. የሉቃስ ወንጌል የተጻፈው ለማን እንደሆነ በመግቢያው ላይ ተገልጿል?", options: ["ለክቡር ቴዎፍሎስ", "ለጳውሎስ", "ለጢሞቴዎስ", "ለቄሳር"], correct: 0 },
+            { question: "80. በሉቃስ ወንጌል መሠረት የዮሐንስ መጥምቅ አባትና እናት ስም ማን ይባላል?", options: ["ዘካርያስና ኤልሳቤጥ", "ኢያቄም እና ሐና", "አምራምና ዮካብድ", "ኤልቃናና ሐና"], correct: 0 },
+            { question: "81. ኢየሱስ አልዓዛርን ከሞተ ከስንት ቀን በኋላ ነው ከአልዓዛር መቃብር ያስነሳው?", options: ["ከ4 ቀን በኋላ", "ከ3 ቀን በኋላ", "ከ1 ቀን በኋላ", "ከ7 ቀን በኋላ"], correct: 0 },
+            { question: "82. በዮሐንስ ወንጌል ኢየሱስ 'እኔ የሕይወት ... ነኝ' ብሏል?", options: ["እንጀራ (ኅብስት)", "ውኃ", "ወይን", "ብርሃን"], correct: 0 },
+            { question: "83. ጳውሎስ በሮሜ መልእክቱ 'በወንጌል አልፈራችም፤ ምክንያቱም ለሚያምኑ ሁሉ ... ነው' ብሏል?", options: ["የእግዚአብሔር ኃይል", "የሰው ጥበብ", "የሕግ ፍጻሜ", "የፍርድ ቃል"], correct: 0 },
+            { question: "84. ጳውሎስ ለቆሮንቶስ ምእመናን በጻፈው 1ኛ መልእክት 'የክርስቶስ ... ናችሁ' ብሏል?", options: ["አካል", "ወታደር", "ወዳጅ", "ወንድም"], correct: 0 },
+            { question: "85. በኤፌሶን መልእክት 4:5 መሠረት 'አንድ ጌታ፤ አንድ እምነት፤ አንዲት ... አለች'?", options: ["ጥምቀት", "ጸሎት", "ጾም", "ስበከት"], correct: 0 },
+            { question: "86. በይሁዳ መልእክት መሠረት የትኞቹ መላእክት ናቸው ለፍርድ በጨለማ የታሰሩት?", options: ["ርስትነታቸውን ያልጠበቁትና መኖሪያቸውን የተዉት መላእክት", "ሁሉም መላእክት", "ቅዱሳን መላእክት", "ሚካኤልና ገብርኤል"], correct: 0 },
+            { question: "87. በራእይ መጽሐፍ የተጠቀሱት የሰባት አብያተ ክርስቲያናት መብራቶች ምንን ይወክላሉ?", options: ["ሰባቱን አብያተ ክርስቲያናት", "ሰባቱን መላእክት", "ሰባቱን መቅሠፍቶች", "ሰባቱን ከዋክብት"], correct: 0 },
+            { question: "88. ኢየሱስ በጌቴሴማኒ የአትክልት ስፍራ ሲጸልይ የነበረው ላብ እንደ ምን ነበር?", options: ["እንደ ታላቅ የደም ነጠብጣብ", "እንደ ውኃ", "እንደ ዘይት", "እንደ እንባ"], correct: 0 },
+            { question: "89. ኢየሱስን አሳልፎ የሰጠው ደቀ መዝሙር ይሁዳ እscript በስንት ብር አሳልፎ ሰጠው?", options: ["በ30 የብር ሳንቲም", "በ20 የብር ሳንቲም", "በ50 የብር ሳንቲም", "በ100 የብር ሳንቲም"], correct: 0 },
+            { question: "90. ኢየሱስ ከተሰቀለ በኋላ የተከበረው የኢየሩሳሌም ሰው አካሉን ለምኖ በራሱ አዲስ መቃብር ያኖረው ማን ነው?", options: ["የአርማትያስ ዮሴፍ", "ኒቆዲሞስ", "ስምዖን", "ቀያፋ"], correct: 0 },
+            { question: "91. በማቴዎስ ወንጌል መሠረት ኢየሱስ ከተጠመቀ በኋላ በመንፈስ ቅዱስ ወደ ምድረ በዳ የተመራው ለምን ነበር?", options: ["በዲያብሎስ ለመፈተን", "ለመጸለይ ብቻ", "ለማስተማር", "ሕዝቡን ለመሸሽ"], correct: 0 },
+            { question: "92. በማርቆስ ወንጌል ኢየሱስ 'የሰንበት ጌታ' እንደሆነ ተናግሯል፤ ሰንበት ለሰው ተፈጠረ ወይስ ሰው ለሰንበት?", options: ["ሰንበት ለሰው ተፈጠረ", "ሰው ለሰንበት ተፈጠረ", "ሁለቱም አልተፈጠሩም", "ለ መላእክት ተፈጠረ"], correct: 0 },
+            { question: "93. በሉቃስ ወንጌል ኢየሱስ በዛፍ ላይ ወጥቶ ያየው አጭሩ ቀራጭ ማን ይባላል?", options: ["ዘኬዎስ", "ማቴዎስ", "ሌዊ", "ቆርኔሌዎስ"], correct: 0 },
+            { question: "94. በዮሐንስ ወንጌል ኢየሱስ በሌሊት መጥቶ ያናገረው የፈሪሳውያን አለቃ ማን ይባላል?", options: ["ኒቆዲሞስ", "ገማልያል", "ቀያፋ", "ሐና"], correct: 0 },
+            { question: "95. ጳውሎስ በሮሜ 12:2 ላይ 'ይህንን ዓለም አትምሰሉ፤ ነገር ግን ... ታደሱ' ብሏል?", options: ["በልባችሁ (በአእምሯችሁ) መታደስ", "በልብሳችሁ", "በሀብታችሁ", "በንግግራችሁ"], correct: 0 },
+            { question: "96. 1ኛ ቆሮንቶስ 15 እንደሚያስረዳው የክርስቲያን እምነት ከንቱ የሚሆነው የትኛው ካልሆነ ነው?", options: ["ክርስቶስ ከሙታን ካልተነሣ", "ታምራት ካልተደረገ", "ቤተ መቅደስ ካልተሠራ", "ጾም ካልተፆመ"], correct: 0 },
+            { question: "97. በኤፌሶን 6:1 ገለጻ መሠረት ልጆች ለወላጆቻቸው በጌታ ምን ማድረግ አለባቸው?", options: ["መታዘዝ አለባቸው", "ገንዘብ መስጠት አለባቸው", "ማስተማር አለባቸው", "ምግብ መስጠት አለባቸው"], correct: 0 },
+            { question: "98. በይሁዳ መልእክት መሠረት ሄኖክ በስንተኛው ትውልድ ላይ ሆኖ ነው ስለ ጌታ ምጽአት የተነበየው?", options: ["ሰባተኛው ትውልድ", "አምስተኛው ትውልድ", "አሥረኛው ትውልድ", "አንደኛው ትውልድ"], correct: 0 },
+            { question: "99. በራእይ መጽሐፍ መሠረት የሞትና የሲኦል መክፈቻ በእጁ ያለው ማን ነው?", options: ["ኢየሱስ ክርስቶስ", "መልአኩ ሚካኤል", "ሐዋርያው ጴጥሮስ", "ዮሐንስ"], correct: 0 },
+            { question: "100. በዮሐንስ ራእይ መጨረሻ ምዕራፍ (22:20) ላይ 'አሜን፤ ጌታ ኢየሱስ ሆይ ...' የሚለው ጸሎት ምንድን ነው?", options: ["ና (ብቅ በል)", "ማረን", "ባርከን", "እርዳን"], correct: 0 }
+        ];
 
-        const authForm = document.getElementById('authForm');
-        const regPhone = document.getElementById('regPhone');
-        const regPassword = document.getElementById('regPassword');
-        const regName = document.getElementById('regName');
-        const nameGroup = document.getElementById('nameGroup');
+        let currentQuestionIndex = 0;
+        let currentLevel = 1;
+        let levelEndIndex = 25;
+        
+        let userName = "";
+        let timeLeft = 30;
+        let timerInterval = null;
+        let attemptCount = 0;
+        
+        let correctAnswersCount = 0;
+        let wrongAnswersCount = 0;
+        let questionAnsweredFlag = false;
 
-        regPhone.addEventListener('change', function() {
-            const phone = regPhone.value.trim();
-            const storedUser = localStorage.getItem('kg_user_' + phone);
-            if(storedUser) {
-                nameGroup.style.display = 'none';
-                document.getElementById('authSubtitle').innerText = "Account found. Enter Password to log in";
+        let unlockedLevels = [true, false, false, false];
+        let completedLevels = [false, false, false, false];
+
+        function validateInput() {
+            const inputVal = document.getElementById("username-input").value.trim();
+            const startBtn = document.getElementById("start-btn");
+            if (inputVal.length > 0) {
+                startBtn.classList.add("active");
+                startBtn.disabled = false;
             } else {
-                nameGroup.style.display = 'block';
-                document.getElementById('authSubtitle').innerText = "Create new Kilogram account";
+                startBtn.classList.remove("active");
+                startBtn.disabled = true;
             }
-        });
-
-        authForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const phone = regPhone.value.trim();
-            const pass = regPassword.value.trim();
-            const name = regName.value.trim() || "User";
-            const myCleanPhone = phone.replace(/[^0-9]/g, '');
-
-            const savedData = localStorage.getItem('kg_user_' + phone);
-            if(savedData) {
-                const parsed = JSON.parse(savedData);
-                if(parsed.pass !== pass) {
-                    alert("የተሳሳተ ፓስወርድ ነው! እባክዎን ደግመው ይሞክሩ።");
-                    return;
-                }
-                myUser = parsed;
-                myUser.cleanPhone = myCleanPhone;
-            } else {
-                myUser = { name, phone, pass, bio: "Available", cleanPhone: myCleanPhone };
-                localStorage.setItem('kg_user_' + phone, JSON.stringify(myUser));
-            }
-
-            if(db) {
-                db.ref('users/' + myCleanPhone).set({ name: myUser.name, phone: myUser.phone, bio: myUser.bio || "Available" });
-            }
-
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('appView').style.display = 'flex';
-
-            updateProfileUI();
-            initFirebaseData();
-        });
-
-        function updateProfileUI() {
-            document.getElementById('profName').innerText = myUser.name;
-            document.getElementById('profPhone').innerText = myUser.phone;
-            document.getElementById('profBio').innerText = myUser.bio || "Available";
-            document.getElementById('profAvatar').innerText = myUser.name.substring(0, 2).toUpperCase();
         }
 
-        function switchNav(pageName) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-            document.getElementById('page' + pageName).classList.add('active');
-            document.getElementById('headerTitle').innerText = pageName;
-        }
-
-        function initFirebaseData() {
-            if(!db) return;
-            db.ref('users').on('value', snap => {
-                const users = snap.val() || {};
-                contactsCache = [];
-                Object.keys(users).forEach(uId => {
-                    const u = users[uId];
-                    if(myUser && u.phone === myUser.phone) return;
-                    contactsCache.push({ id: uId, name: u.name, phone: u.phone });
-                });
-                renderContactsUI(contactsCache);
-            });
-        }
-
-        function renderContactsUI(list) {
-            const contactsContainer = document.getElementById('contactsListContainer');
-            const chatsContainer = document.getElementById('chatsListContainer');
-            contactsContainer.innerHTML = "";
-            chatsContainer.innerHTML = "";
-
-            list.forEach(u => {
-                const row = `
-                    <div class="list-item" onclick="openPrivateChat('${u.id}', '${u.name}')">
-                        <div class="avatar">${u.name.substring(0, 2).toUpperCase()}</div>
-                        <div class="item-info">
-                            <h4>${u.name}</h4>
-                            <p>📞 ${u.phone}</p>
-                        </div>
-                    </div>
-                `;
-                contactsContainer.innerHTML += row;
-                chatsContainer.innerHTML += row;
-            });
-        }
-
-        function filterContacts() {
-            const query = document.getElementById('contactSearchInput').value.toLowerCase();
-            const filtered = contactsCache.filter(c => c.name.toLowerCase().includes(query) || c.phone.includes(query));
-            renderContactsUI(filtered);
-        }
-
-        function openPrivateChat(targetId, targetName) {
-            activeChatTargetId = targetId;
-            const ids = [myUser.cleanPhone, targetId].sort();
-            activeChatRoomId = `private_${ids[0]}_${ids[1]}`;
-
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('pageActiveChat').classList.add('active');
-            document.getElementById('headerTitle').innerText = targetName;
+        function goToLevelSelection() {
+            userName = document.getElementById("username-input").value.trim();
             
-            listenPrivateMessages(activeChatRoomId);
+            const userHeader = document.getElementById("user-header");
+            userHeader.innerText = `ውድ የጌታ ልጅ ${userName}`;
+            userHeader.style.display = "block";
+
+            document.getElementById("name-section").style.display = "none";
+            document.getElementById("level-section").style.display = "block";
+            
+            updateLevelCardsUI();
         }
 
-        function listenPrivateMessages(roomId) {
-            const box = document.getElementById('msgContainer');
-            box.innerHTML = "";
-            if(!db) return;
+        function updateLevelCardsUI() {
+            for (let i = 1; i <= 4; i++) {
+                const card = document.getElementById(`level-card-${i}`);
+                if (unlockedLevels[i - 1]) {
+                    card.classList.remove("locked");
+                    card.classList.add("unlocked");
+                } else {
+                    card.classList.add("locked");
+                    card.classList.remove("unlocked");
+                }
 
-            if(msgListener) msgListener.off();
+                if (completedLevels[i - 1]) {
+                    const crossesDiv = document.getElementById(`crosses-${i}`);
+                    crossesDiv.innerHTML = '<span class="cross-bright">✝</span><span class="cross-bright">✝</span><span class="cross-bright">✝</span>';
+                }
+            }
+        }
 
-            msgListener = db.ref('private_messages/' + roomId);
-            msgListener.on('value', snap => {
-                box.innerHTML = "";
-                const msgs = snap.val() || {};
-                Object.keys(msgs).forEach(mId => {
-                    const m = msgs[mId];
-                    const isMine = myUser && m.senderPhone === myUser.phone;
-                    let contentHtml = m.text || "";
-                    if(m.type === 'image') {
-                        contentHtml = `<img src="${m.fileData}" alt="shared image">`;
-                    } else if(m.type === 'file') {
-                        contentHtml = `📎 <a href="${m.fileData}" download="${m.fileName}" style="color:var(--link-color);">${m.fileName}</a>`;
+        function startLevel(lvl) {
+            if (!unlockedLevels[lvl - 1]) return;
+
+            currentLevel = lvl;
+            currentQuestionIndex = (lvl - 1) * 25;
+            levelEndIndex = lvl * 25;
+
+            correctAnswersCount = 0;
+            wrongAnswersCount = 0;
+
+            document.getElementById("correct-count").innerText = "0";
+            document.getElementById("wrong-count").innerText = "0";
+
+            document.getElementById("level-section").style.display = "none";
+            document.getElementById("top-panel").style.display = "flex";
+            document.getElementById("game-section").style.display = "block";
+
+            loadQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            document.getElementById("timer-display").innerText = `⏱ ${timeLeft}s`;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer-display").innerText = `⏱ ${timeLeft}s`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (!questionAnsweredFlag) {
+                        wrongAnswersCount++;
+                        document.getElementById("wrong-count").innerText = wrongAnswersCount;
                     }
-                    box.innerHTML += `<div class="msg ${isMine ? 'out' : 'in'}">${contentHtml}</div>`;
-                });
-                box.scrollTop = box.scrollHeight;
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            attemptCount = 0;
+            questionAnsweredFlag = false;
+            const q = quizData[currentQuestionIndex];
+            
+            document.getElementById("q-num-display").innerText = `ደረጃ ${currentLevel} | ጥያቄ ${currentQuestionIndex + 1} ከ 100`;
+            document.getElementById("question-text").innerText = q.question;
+            
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.classList.add("option-btn");
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
             });
+
+            document.getElementById("next-btn").style.display = "none";
+
+            startTimer();
         }
 
-        function sendMsg() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if(!text || !myUser || !activeChatRoomId) return;
+        function checkAnswer(selectedIndex, btn) {
+            if (questionAnsweredFlag) return;
+            const q = quizData[currentQuestionIndex];
 
-            if(db) {
-                db.ref('private_messages/' + activeChatRoomId).push({
-                    senderPhone: myUser.phone,
-                    text: text,
-                    type: 'text',
-                    time: Date.now()
-                });
-            }
-            input.value = "";
-        }
+            if (selectedIndex === q.correct) {
+                questionAnsweredFlag = true;
+                clearInterval(timerInterval);
+                btn.classList.add("correct");
+                disableAllButtons();
+                
+                correctAnswersCount++;
+                document.getElementById("correct-count").innerText = correctAnswersCount;
 
-        function sendMediaFile(input) {
-            if(input.files && input.files[0]) {
-                const file = input.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if(db && activeChatRoomId) {
-                        const isImage = file.type.startsWith('image/');
-                        db.ref('private_messages/' + activeChatRoomId).push({
-                            senderPhone: myUser.phone,
-                            fileData: e.target.result,
-                            fileName: file.name,
-                            type: isImage ? 'image' : 'file',
-                            time: Date.now()
-                        });
-                    }
+                document.getElementById("next-btn").style.display = "inline-block";
+            } else {
+                btn.classList.add("wrong");
+                btn.disabled = true;
+                attemptCount++;
+
+                if (attemptCount >= 2) {
+                    questionAnsweredFlag = true;
+                    clearInterval(timerInterval);
+                    disableAllButtons();
+                    
+                    wrongAnswersCount++;
+                    document.getElementById("wrong-count").innerText = wrongAnswersCount;
+
+                    setTimeout(() => {
+                        nextQuestion();
+                    }, 1000);
                 }
-                reader.readAsDataURL(file);
-                input.value = "";
             }
         }
 
-        /* Modal Handlers */
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function saveAccountInfo() {
-            const newName = document.getElementById('editNameInput').value.trim();
-            const newPhone = document.getElementById('editPhoneInput').value.trim();
-            const newBio = document.getElementById('editBioInput').value.trim();
-
-            if(newName) myUser.name = newName;
-            if(newPhone) myUser.phone = newPhone;
-            if(newBio) myUser.bio = newBio;
-
-            localStorage.setItem('kg_user_' + myUser.phone, JSON.stringify(myUser));
-            if(db) {
-                db.ref('users/' + myUser.cleanPhone).update({ name: myUser.name, phone: myUser.phone, bio: myUser.bio });
-            }
-
-            updateProfileUI();
-            closeModal('modalAccount');
-            alert("Account Info Updated!");
+        function disableAllButtons() {
+            const buttons = document.querySelectorAll(".option-btn");
+            buttons.forEach(b => b.disabled = true);
         }
 
-        function applyWallpaper() {
-            const fileInput = document.getElementById('wallpaperFileInput');
-            if(fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('msgContainer').style.backgroundImage = `url('${e.target.result}')`;
-                    closeModal('modalChatSettings');
-                    alert("Chat Wallpaper Updated!");
-                }
-                reader.readAsDataURL(fileInput.files[0]);
+        function nextQuestion() {
+            clearInterval(timerInterval);
+            
+            if (!questionAnsweredFlag) {
+                questionAnsweredFlag = true;
+                wrongAnswersCount++;
+                document.getElementById("wrong-count").innerText = wrongAnswersCount;
+            }
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < levelEndIndex) {
+                loadQuestion();
+            } else {
+                finishLevel();
             }
         }
 
-        function saveNewPassword() {
-            const newPass = document.getElementById('newPasswordInput').value.trim();
-            if(newPass) {
-                myUser.pass = newPass;
-                localStorage.setItem('kg_user_' + myUser.phone, JSON.stringify(myUser));
-                closeModal('modalPrivacy');
-                alert("Password successfully updated!");
+        function finishLevel() {
+            completedLevels[currentLevel - 1] = true;
+            if (currentLevel < 4) {
+                unlockedLevels[currentLevel] = true;
+            }
+
+            document.getElementById("game-section").style.display = "none";
+            document.getElementById("top-panel").style.display = "none";
+            document.getElementById("level-section").style.display = "block";
+
+            updateLevelCardsUI();
+
+            if (currentLevel === 4) {
+                document.getElementById("level-welcome-text").innerText = `እንኳን ደስ አለዎት ${userName}! አራቱንም ደረጃዎች በተሳካ ሁኔታ አጠናቀዋል።`;
+            } else {
+                document.getElementById("level-welcome-text").innerText = `እንኳን ደስ አለዎት ${userName}! ደረጃ ${currentLevel}ን አጠናቀዋል። ወደ ቀጣዩ ደረጃ መሸጋገር ይችላሉ።`;
             }
         }
     </script>
 </body>
 </html>
+
